@@ -225,6 +225,14 @@ python runstego.py encode cover.png "Secret" --model results/model/acc0.95_psnr3
 
 Nếu không chỉ định `--model`, hệ thống tự động chọn model tốt nhất từ `results/model/`.
 
+#### Tạo ảnh so sánh chất lượng
+
+```bash
+python runstego.py encode cover.png "Secret" --compare
+```
+
+Option `--compare` sẽ tự động tạo ảnh so sánh giữa cover và stego kèm metrics (PSNR, MSE, correlation).
+
 ### 3. Trích xuất tin (Decoding)
 
 #### Cú pháp cơ bản
@@ -280,6 +288,14 @@ Output mặc định: `recovered_<input_name>.png`
 ```bash
 python runstego.py reverse stego.png --output recovered_cover.png
 ```
+
+#### So sánh chất lượng khôi phục
+
+```bash
+python runstego.py reverse stego.png --cover cover.png --compare
+```
+
+Option `--compare` yêu cầu `--cover` để tạo ảnh so sánh giữa cover, stego và recovered kèm metrics.
 
 ### 5. Đánh giá chất lượng
 
