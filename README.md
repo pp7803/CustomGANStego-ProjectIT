@@ -45,11 +45,45 @@ git clone <repository-url>
 cd CustomGANStego
 ```
 
-### 2. Cài đặt dependencies
+### 2. Khởi tạo môi trường ảo (Virtual Environment)
+
+#### Cách 1: Sử dụng script tự động (Khuyến nghị)
 
 ```bash
+./scripts/setup-env.sh
+```
+
+Script sẽ tự động:
+- Tạo virtual environment `prjvenv`
+- Cập nhật pip
+- Cài đặt tất cả dependencies từ requirements.txt
+
+Sau khi chạy xong, kích hoạt môi trường:
+```bash
+source prjvenv/bin/activate
+```
+
+#### Cách 2: Thiết lập thủ công
+
+Tạo virtual environment:
+```bash
+python3 -m venv prjvenv
+```
+
+Kích hoạt môi trường:
+```bash
+source prjvenv/bin/activate  # macOS/Linux
+# hoặc
+prjvenv\Scripts\activate     # Windows
+```
+
+Cài đặt dependencies:
+```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+### 3. Cài đặt dependencies (nếu chưa dùng script)
 
 Các thư viện chính:
 - torch
@@ -61,7 +95,17 @@ Các thư viện chính:
 - reedsolo
 - pycryptodome (tùy chọn, cho encryption)
 
-### 3. Chuẩn bị dataset
+**Lưu ý**: Luôn kích hoạt virtual environment trước khi làm việc:
+```bash
+source prjvenv/bin/activate
+```
+
+Để thoát khỏi môi trường ảo:
+```bash
+deactivate
+```
+
+### 4. Chuẩn bị dataset
 
 Dataset mặc định: DIV2K
 
