@@ -184,15 +184,17 @@ Metrics được theo dõi:
 
 ### 2. Giấu tin (Encoding)
 
-#### Chế độ cơ bản (không mã hóa)
+#### Cú pháp cơ bản
 
 ```bash
-python runencode.py <cover_image> "<secret_text>"
+python runstego.py encode <cover_image> "<secret_text>" [options]
 ```
+
+#### Chế độ cơ bản (không mã hóa)
 
 Ví dụ:
 ```bash
-python runencode.py test.png "This is my secret message"
+python runstego.py encode test.png "This is my secret message"
 ```
 
 Output mặc định: `stego_<input_name>.png`
@@ -200,7 +202,7 @@ Output mặc định: `stego_<input_name>.png`
 #### Chỉ định file output
 
 ```bash
-python runencode.py cover.png "Secret" --output my_stego.png
+python runstego.py encode cover.png "Secret" --output my_stego.png
 ```
 
 #### Chế độ mã hóa (RSA + AES)
@@ -212,63 +214,71 @@ python genRSA.py --bits 2048 --public public_key.pem --private private_key.pem
 
 Encode với encryption:
 ```bash
-python runencode.py cover.png "Confidential message" --encrypt --public-key public_key.pem
+python runstego.py encode cover.png "Confidential message" --encrypt --public-key public_key.pem
 ```
 
 #### Chỉ định model cụ thể
 
 ```bash
-python runencode.py cover.png "Secret" --model results/model/acc0.95_psnr35.dat
+python runstego.py encode cover.png "Secret" --model results/model/acc0.95_psnr35.dat
 ```
 
 Nếu không chỉ định `--model`, hệ thống tự động chọn model tốt nhất từ `results/model/`.
 
 ### 3. Trích xuất tin (Decoding)
 
-#### Chế độ cơ bản
+#### Cú pháp cơ bản
 
 ```bash
-python rundecode.py <stego_image>
+python runstego.py decode <stego_image> [options]
 ```
+
+#### Chế độ cơ bản
 
 Ví dụ:
 ```bash
-python rundecode.py stego_test.png
+python runstego.py decode stego_test.png
 ```
+
+Thông điệp sẽ được in ra màn hình console.
 
 #### Lưu kết quả vào file
 
 ```bash
-python rundecode.py stego.png output.txt
+python runstego.py decode stego.png --output secret.txt
 ```
 
 #### Giải mã với encryption
 
 ```bash
-python rundecode.py stego.png --encrypt --private-key private_key.pem
+python runstego.py decode stego.png --encrypt --private-key private_key.pem
 ```
 
 Hoặc lưu vào file:
 ```bash
-python rundecode.py stego.png secret.txt --encrypt --private-key private_key.pem
+python runstego.py decode stego.png --output secret.txt --encrypt --private-key private_key.pem
 ```
 
 ### 4. Khôi phục ảnh gốc (Reverse Hiding)
 
+#### Cú pháp cơ bản
+
 ```bash
-python runreverse.py <stego_image>
+python runstego.py reverse <stego_image> [options]
 ```
 
-Ví dụ:
+#### Ví dụ cơ bản
+
 ```bash
-python runreverse.py stego_test.png
+python runstego.py reverse stego_test.png
 ```
 
-Output mặc định: `<input_name>_reversehiding.png`
+Output mặc định: `recovered_<input_name>.png`
 
-Chỉ định output:
+#### Chỉ định file output
+
 ```bash
-python runreverse.py stego.png recovered_cover.png
+python runstego.py reverse stego.png --output recovered_cover.png
 ```
 
 ### 5. Đánh giá chất lượng
@@ -288,9 +298,7 @@ Chỉnh sửa đường dẫn ảnh trong file để so sánh:
 ```
 CustomGANStego/
 ├── train.py                  # Training script
-├── runencode.py             # Encode script (giấu tin)
-├── rundecode.py             # Decode script (trích xuất)
-├── runreverse.py            # Reverse hiding script
+├── runstego.py              # Main steganography tool (encode/decode/reverse)
 ├── genRSA.py                # Generate RSA keypairs
 ├── compute_metrics.py       # Tính metrics PSNR/SSIM
 ├── plotsummary.py           # Visualize training progress
