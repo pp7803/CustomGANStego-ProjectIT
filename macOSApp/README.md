@@ -578,7 +578,7 @@ Alice                          Bob
 
 | Phương pháp        | PSNR   | SSIM  | Dung lượng | Tốc độ     | Reverse  |
 | ------------------ | ------ | ----- | ---------- | ---------- | -------- |
-| **CustomGANStego** | 45+ dB | 0.99+ | Cao        | Nhanh      | ✅ Có    |
+| **CustomGANStego** | 40+ dB | 0.99+ | Cao        | Nhanh      | ✅ Có    |
 | LSB                | 50+ dB | 0.99+ | Thấp       | Rất nhanh  | ❌ Không |
 | DCT-based          | 40+ dB | 0.95+ | Trung bình | Trung bình | ❌ Không |
 | DWT-based          | 35+ dB | 0.93+ | Trung bình | Chậm       | ❌ Không |
