@@ -4,12 +4,12 @@
 
 ## Features
 
-- **📝 Encode** - Giấu tin vào ảnh với GAN
-- **🔍 Decode** - Trích xuất tin từ ảnh stego
-- **⏮️ Reverse** - Khôi phục ảnh gốc (lossless)
-- **🔑 GenRSA** - Tạo khóa RSA cho mã hóa
-- **📊 Compare** - Tính PSNR/SSIM/MSE metrics
-- **🔒 Encryption** - RSA+AES hybrid encryption
+- **Encode Encode** - Giấu tin vào ảnh với GAN
+- **Decode Decode** - Trích xuất tin từ ảnh stego
+- **Reverse Reverse** - Khôi phục ảnh gốc (lossless)
+- **GenRSA GenRSA** - Tạo khóa RSA cho mã hóa
+- **Compare Compare** - Tính PSNR/SSIM/MSE metrics
+- **Security Encryption** - RSA+AES hybrid encryption
 
 ## Quick Start
 
@@ -26,12 +26,12 @@ build_app.bat
 
 Script sẽ tự động:
 
-1. ✅ Kiểm tra Python và dependencies
-2. ✅ Tạo/activate virtual environment
-3. ✅ Cài đặt packages thiếu
-4. ✅ Kiểm tra model files
-5. ✅ Build executable với PyInstaller
-6. ✅ Hướng dẫn sử dụng
+1.  Kiểm tra Python và dependencies
+2.  Tạo/activate virtual environment
+3.  Cài đặt packages thiếu
+4.  Kiểm tra model files
+5.  Build executable với PyInstaller
+6.  Hướng dẫn sử dụng
 
 ### Run Application
 
@@ -80,7 +80,7 @@ Dependencies chính:
 - pycryptodome>=3.17.0
 - pyinstaller>=5.10.0
 
-## 🔨 Build từ Source
+##  Build từ Source
 
 ### Bước 1: Setup môi trường
 
@@ -145,32 +145,32 @@ dist\CustomGANStego.exe
 
 App có 5 tabs chính:
 
-1. **📝 Encode Tab**
+1. **Encode Encode Tab**
 
    - Chọn ảnh cover
    - Nhập tin cần giấu
    - Tùy chọn mã hóa RSA+AES
    - Export ảnh stego
 
-2. **🔍 Decode Tab**
+2. **Decode Decode Tab**
 
    - Chọn ảnh stego
    - Tùy chọn giải mã
    - Xem/lưu tin đã trích xuất
 
-3. **⏮️ Reverse Tab**
+3. **Reverse Reverse Tab**
 
    - Chọn ảnh stego
    - Khôi phục ảnh cover gốc
    - Preview trước/sau
 
-4. **🔑 GenRSA Tab**
+4. **GenRSA GenRSA Tab**
 
    - Tạo cặp khóa RSA
    - Chọn độ dài khóa (1024-4096 bits)
    - Lưu public/private key
 
-5. **📊 Compare Tab**
+5. **Compare Compare Tab**
    - So sánh 2 ảnh
    - Tính PSNR/SSIM/MSE
    - Hiển thị difference map
@@ -179,48 +179,48 @@ App có 5 tabs chính:
 
 #### 1. Tạo khóa RSA (lần đầu)
 
-- Vào tab **🔑 GenRSA**
+- Vào tab **GenRSA GenRSA**
 - Chọn độ dài khóa: 2048 bits
 - Chọn thư mục lưu
-- Click "🔑 Tạo khóa"
+- Click "GenRSA Tạo khóa"
 - Lưu `public_key.pem` và `private_key.pem`
 
 #### 2. Giấu tin có mã hóa
 
-- Vào tab **📝 Encode**
+- Vào tab **Encode Encode**
 - Click "Chọn ảnh..." → chọn ảnh cover
 - Nhập tin cần giấu
-- ✅ Check "Sử dụng mã hóa RSA+AES"
+-  Check "Sử dụng mã hóa RSA+AES"
 - Click "Chọn public key..." → chọn `public_key.pem`
-- Click "🚀 Encode"
+- Click "Encode Encode"
 - Lưu ảnh stego
 
 #### 3. Trích xuất tin
 
-- Vào tab **🔍 Decode**
+- Vào tab **Decode Decode**
 - Click "Chọn ảnh..." → chọn ảnh stego
-- ✅ Check "Giải mã RSA+AES"
+-  Check "Giải mã RSA+AES"
 - Click "Chọn private key..." → chọn `private_key.pem`
-- Click "🔍 Decode"
+- Click "Decode Decode"
 - Tin sẽ hiển thị trong textbox
-- Có thể click "💾 Save" để lưu ra file
+- Có thể click "Save Save" để lưu ra file
 
 #### 4. Khôi phục ảnh gốc
 
-- Vào tab **⏮️ Reverse**
+- Vào tab **Reverse Reverse**
 - Click "Chọn ảnh..." → chọn ảnh stego
-- Click "⏮️ Reverse"
+- Click "Reverse Reverse"
 - Lưu ảnh đã khôi phục
 - Preview hiển thị stego vs recovered
 
 #### 5. Đánh giá chất lượng
 
-- Vào tab **📊 Compare**
+- Vào tab **Compare Compare**
 - Click "Chọn ảnh 1..." → chọn cover gốc
 - Click "Chọn ảnh 2..." → chọn stego/recovered
-- Click "📊 Tính Metrics"
+- Click "Compare Tính Metrics"
 - Xem PSNR/SSIM/MSE
-- Click "💾 Save PNG" để lưu comparison
+- Click "Save Save PNG" để lưu comparison
 
 ## Customization
 
@@ -261,7 +261,7 @@ Thêm icon cho app:
    --icon=icon.ico
    ```
 
-## 📦 Distribution
+## Requirements Distribution
 
 ### Chuẩn bị cho Distribution
 
@@ -345,7 +345,7 @@ Name: "{group}\CustomGANStego"; Filename: "{app}\CustomGANStego.exe"
 
 ### Model không load
 
-**Triệu chứng:** "⚠️ No model found"
+**Triệu chứng:** " No model found"
 
 **Giải pháp:**
 

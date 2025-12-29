@@ -18,6 +18,7 @@ Platform: Windows
 import sys
 import os
 import re
+import time
 from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -26,6 +27,7 @@ from PIL import Image, ImageTk
 import numpy as np
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
+import psutil
 
 # Add parent directory to path to import modules
 parent_dir = Path(__file__).parent.parent
@@ -136,6 +138,11 @@ class SteganographyApp:
         self.use_encryption = tk.BooleanVar(value=False)
         self.public_key_path = None
         self.private_key_path = None
+        
+        # RAM monitoring
+        self.process = psutil.Process()
+        self.ram_usage_mb = 0
+        self.peak_ram_mb = 0
         
         # Setup UI
         self.setup_ui()
@@ -587,6 +594,10 @@ class SteganographyApp:
         # Run in thread
         def encode_thread():
             try:
+                # Start RAM monitoring
+                start_ram = self.process.memory_info().rss / (1024 * 1024)  # MB
+                start_time = time.time()
+                
                 self.encode_status.config(text="⏳ Đang encode...", foreground='blue')
                 self.root.update()
                 
@@ -614,9 +625,19 @@ class SteganographyApp:
                 encode_message(self.cover_image_path, final_message, output_path, 
                              model_path=self.model_path)
                 
-                self.encode_status.config(text=f"✅ Đã lưu: {Path(output_path).name}", 
-                                        foreground='green')
-                messagebox.showinfo("Thành công", f"Đã encode và lưu vào:\n{output_path}")
+                # End RAM monitoring
+                end_ram = self.process.memory_info().rss / (1024 * 1024)  # MB
+                elapsed_time = time.time() - start_time
+                ram_used = end_ram - start_ram
+                self.peak_ram_mb = max(self.peak_ram_mb, end_ram)
+                
+                status_msg = f"✅ Lưu: {Path(output_path).name} | RAM: {ram_used:.1f}MB | Time: {elapsed_time:.2f}s"
+                self.encode_status.config(text=status_msg, foreground='green')
+                
+                # Update debug tab
+                self.update_ram_info()
+                
+                messagebox.showinfo("Thành công", f"Đã encode và lưu vào:\n{output_path}\n\nRAM used: {ram_used:.1f} MB\nTime: {elapsed_time:.2f}s")
                 
             except Exception as e:
                 self.encode_status.config(text=f"❌ Lỗi: {str(e)}", foreground='red')
@@ -661,6 +682,10 @@ class SteganographyApp:
             
         def decode_thread():
             try:
+                # Start RAM monitoring
+                start_ram = self.process.memory_info().rss / (1024 * 1024)  # MB
+                start_time = time.time()
+                
                 self.decode_status.config(text="⏳ Đang decode...", foreground='blue')
                 self.root.update()
                 
@@ -692,7 +717,17 @@ class SteganographyApp:
                 self.decode_text.delete('1.0', tk.END)
                 self.decode_text.insert('1.0', message)
                 
-                self.decode_status.config(text="✅ Decode thành công!", foreground='green')
+                # End RAM monitoring
+                end_ram = self.process.memory_info().rss / (1024 * 1024)  # MB
+                elapsed_time = time.time() - start_time
+                ram_used = end_ram - start_ram
+                self.peak_ram_mb = max(self.peak_ram_mb, end_ram)
+                
+                status_msg = f"✅ Decode thành công! | RAM: {ram_used:.1f}MB | Time: {elapsed_time:.2f}s"
+                self.decode_status.config(text=status_msg, foreground='green')
+                
+                # Update debug tab
+                self.update_ram_info()
                 
             except Exception as e:
                 self.decode_status.config(text=f"❌ Lỗi: {str(e)}", foreground='red')
@@ -885,6 +920,14 @@ class SteganographyApp:
                                                     font=('Courier New', 9))
         self.debug_log.pack(fill='both', expand=True)
         
+        # RAM Info display
+        ram_frame = ttk.LabelFrame(frame, text="RAM Usage", padding=10)
+        ram_frame.pack(fill='x', pady=5)
+        
+        self.ram_info_label = ttk.Label(ram_frame, text="Current RAM: N/A | Peak RAM: N/A", 
+                                        font=('Courier New', 9))
+        self.ram_info_label.pack(pady=5)
+        
         # Status
         self.debug_status = ttk.Label(frame, text="Console logging active", foreground='green')
         self.debug_status.pack(pady=5)
@@ -957,6 +1000,15 @@ class SteganographyApp:
         self.log_messages.clear()
         self.debug_status.config(text="Log cleared", foreground='blue')
         
+    def update_ram_info(self):
+        """Update RAM usage information in Debug tab"""
+        try:
+            current_ram = self.process.memory_info().rss / (1024 * 1024)  # MB
+            ram_info = f"Current RAM: {current_ram:.1f} MB | Peak RAM: {self.peak_ram_mb:.1f} MB"
+            self.ram_info_label.config(text=ram_info)
+        except Exception as e:
+            self.ram_info_label.config(text=f"RAM monitoring error: {str(e)}")
+    
     def save_debug_log(self):
         """Save debug log to file"""
         content = self.debug_log.get('1.0', tk.END).strip()

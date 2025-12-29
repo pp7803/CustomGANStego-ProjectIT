@@ -9,6 +9,9 @@ import uuid
 import zipfile
 import shutil
 import requests
+import logging
+import traceback
+import sys
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
@@ -21,8 +24,25 @@ from PIL import Image
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('stegan_api.log')
+    ]
+)
+logger = logging.getLogger(__name__)
+
 # Import steganography modules
-from enhancedstegan import encode_message, decode_message, reverse_hiding
+try:
+    from enhancedstegan import encode_message, decode_message, reverse_hiding
+    logger.info("✓ Successfully imported steganography modules")
+except Exception as e:
+    logger.error(f"✗ Failed to import steganography modules: {e}")
+    logger.error(traceback.format_exc())
+    raise
 
 # RSA imports
 try:
@@ -41,9 +61,33 @@ CORS(app)
 UPLOAD_FOLDER = 'uploads'
 OUTPUT_FOLDER = 'outputs'
 KEYS_FOLDER = 'keys'
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+MODEL_FOLDER = 'model'
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
+# Find best model file
+BEST_MODEL_PATH = None
+try:
+    if os.path.exists(MODEL_FOLDER):
+        # First try to find model.dat
+        default_model = os.path.join(MODEL_FOLDER, 'model.dat')
+        if os.path.exists(default_model):
+            BEST_MODEL_PATH = default_model
+            logger.info(f"✓ Found default model: {BEST_MODEL_PATH}")
+        else:
+            # If not found, get any .dat file (sorted by name, ep016 should be last)
+            model_files = sorted([f for f in os.listdir(MODEL_FOLDER) if f.endswith('.dat')], reverse=True)
+            if model_files:
+                BEST_MODEL_PATH = os.path.join(MODEL_FOLDER, model_files[0])
+                logger.info(f"✓ Found model: {BEST_MODEL_PATH}")
+            else:
+                logger.warning("⚠ No model files found, using random weights")
+    else:
+        logger.warning("⚠ Model folder not found, using random weights")
+except Exception as e:
+    logger.error(f"✗ Error loading model: {e}")
+
+# Ensure folders exist
 # Ensure folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
@@ -96,11 +140,35 @@ def download_image_from_url(url, save_path):
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({
+    import sys
+    import torch
+    
+    health_status = {
         'status': 'healthy',
         'service': 'CustomGANStego API',
-        'crypto_available': CRYPTO_AVAILABLE
-    })
+        'crypto_available': CRYPTO_AVAILABLE,
+        'python_version': sys.version,
+        'torch_version': torch.__version__,
+        'cuda_available': torch.cuda.is_available(),
+        'mps_available': torch.backends.mps.is_available() if hasattr(torch.backends, 'mps') else False,
+    }
+    
+    # Check if modules can be imported
+    try:
+        from enhancedstegan import encode_message, decode_message, reverse_hiding
+        health_status['stegan_module'] = 'OK'
+    except Exception as e:
+        health_status['stegan_module'] = f'ERROR: {str(e)}'
+        health_status['status'] = 'degraded'
+    
+    # Check folders
+    health_status['folders'] = {
+        'uploads': os.path.exists(app.config['UPLOAD_FOLDER']),
+        'outputs': os.path.exists(app.config['OUTPUT_FOLDER']),
+        'keys': os.path.exists(app.config['KEYS_FOLDER']),
+    }
+    
+    return jsonify(health_status)
 
 
 @app.route('/encode', methods=['POST'])
@@ -115,6 +183,9 @@ def encode():
     - public_key: public key file (if use_encryption=true)
     - return_url: boolean (optional, default=true) - return URL instead of file
     """
+    cover_path = None
+    stego_path = None
+    
     try:
         # Validate inputs
         if 'cover_image' not in request.files:
@@ -140,8 +211,11 @@ def encode():
         cover_path = os.path.join(app.config['UPLOAD_FOLDER'], cover_filename)
         cover_file.save(cover_path)
         
+        logger.info(f"[ENCODE] Request ID: {unique_id}")
+        logger.info(f"[ENCODE] Saved cover image: {cover_path}")
+        
         # Handle encryption
-        public_key = None
+        final_message = message
         if use_encryption:
             if 'public_key' not in request.files:
                 return jsonify({'error': 'Public key required for encryption'}), 400
@@ -152,17 +226,51 @@ def encode():
             pub_key_file = request.files['public_key']
             pub_key_content = pub_key_file.read().decode('utf-8')
             public_key = RSA.import_key(pub_key_content)
+            
+            logger.info(f"[ENCODE] Encrypting message...")
+            
+            # Encrypt the message using RSA+AES hybrid encryption
+            # Generate AES key
+            aes_key = get_random_bytes(32)  # 256-bit AES key
+            
+            # Encrypt message with AES
+            cipher_aes = AES.new(aes_key, AES.MODE_CBC)
+            iv = cipher_aes.iv
+            encrypted_data = cipher_aes.encrypt(pad(message.encode('utf-8'), AES.block_size))
+            
+            # Encrypt AES key with RSA
+            cipher_rsa = PKCS1_OAEP.new(public_key)
+            encrypted_key = cipher_rsa.encrypt(aes_key)
+            
+            # Combine: encrypted_key_length(4 bytes) + encrypted_key + iv(16 bytes) + encrypted_data
+            import struct
+            key_len = struct.pack('>I', len(encrypted_key))
+            encrypted_package = key_len + encrypted_key + iv + encrypted_data
+            
+            # Convert to base64 for text encoding
+            import base64
+            final_message = base64.b64encode(encrypted_package).decode('ascii')
         
         # Encode message
         stego_filename = f"{unique_id}_stego.png"
         stego_path = os.path.join(app.config['OUTPUT_FOLDER'], stego_filename)
         
-        encode_message(
-            cover_image_path=cover_path,
-            secret_text=message,
-            output_path=stego_path,
-            public_key=public_key
-        )
+        logger.info(f"[ENCODE] Starting steganography encoding...")
+        logger.info(f"[ENCODE] Message length: {len(final_message)} chars")
+        logger.info(f"[ENCODE] Using model: {BEST_MODEL_PATH or 'random weights'}")
+        
+        try:
+            encode_message(
+                cover_image_path=cover_path,
+                secret_text=final_message,
+                output_path=stego_path,
+                model_path=BEST_MODEL_PATH
+            )
+            logger.info(f"[ENCODE] Encoding complete: {stego_path}")
+        except Exception as encode_error:
+            logger.error(f"[ENCODE] encode_message() failed: {encode_error}")
+            logger.error(traceback.format_exc())
+            raise
         
         # Cleanup
         cleanup_old_files(app.config['UPLOAD_FOLDER'])
@@ -173,6 +281,8 @@ def encode():
             # Build absolute URL
             base_url = request.url_root.rstrip('/')
             file_url = f"{base_url}/files/{stego_filename}"
+            
+            logger.info(f"[ENCODE] Success! URL: {file_url}")
             
             return jsonify({
                 'success': True,
@@ -188,7 +298,22 @@ def encode():
             )
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_msg = str(e)
+        traceback_str = traceback.format_exc()
+        
+        logger.error(f"[ENCODE ERROR] {error_msg}")
+        logger.error(f"[ENCODE TRACEBACK]\n{traceback_str}")
+        
+        # Cleanup on error
+        try:
+            if cover_path and os.path.exists(cover_path):
+                os.remove(cover_path)
+            if stego_path and os.path.exists(stego_path):
+                os.remove(stego_path)
+        except:
+            pass
+        
+        return jsonify({'error': error_msg, 'traceback': traceback_str}), 500
 
 
 @app.route('/decode', methods=['POST'])
@@ -202,9 +327,11 @@ def decode():
     - use_decryption: boolean (optional)
     - private_key: private key file (if use_decryption=true)
     """
+    stego_path = None
+    
     try:
-        stego_path = None
         unique_id = str(uuid.uuid4())
+        logger.info(f"[DECODE] Request ID: {unique_id}")
         
         # Check if URL is provided
         stego_url = request.form.get('stego_url', '').strip()
@@ -238,8 +365,13 @@ def decode():
         
         use_decryption = request.form.get('use_decryption', 'false').lower() == 'true'
         
+        # Decode message
+        logger.info(f"[DECODE] Using model: {BEST_MODEL_PATH or 'random weights'}")
+        decoded_message = decode_message(stego_image_path=stego_path, model_path=BEST_MODEL_PATH)
+        logger.info(f"[DECODE] Decoded message length: {len(decoded_message)} chars")
+        
         # Handle decryption
-        private_key = None
+        final_message = decoded_message
         if use_decryption:
             if 'private_key' not in request.files:
                 return jsonify({'error': 'Private key required for decryption'}), 400
@@ -250,23 +382,54 @@ def decode():
             priv_key_file = request.files['private_key']
             priv_key_content = priv_key_file.read().decode('utf-8')
             private_key = RSA.import_key(priv_key_content)
-        
-        # Decode message
-        message = decode_message(
-            stego_image_path=stego_path,
-            private_key=private_key
-        )
+            
+            # Decrypt the message using RSA+AES hybrid decryption
+            import base64
+            import struct
+            
+            # Decode from base64
+            encrypted_package = base64.b64decode(decoded_message)
+            
+            # Extract components
+            key_len = struct.unpack('>I', encrypted_package[:4])[0]
+            encrypted_key = encrypted_package[4:4+key_len]
+            iv = encrypted_package[4+key_len:4+key_len+16]
+            encrypted_data = encrypted_package[4+key_len+16:]
+            
+            # Decrypt AES key with RSA
+            cipher_rsa = PKCS1_OAEP.new(private_key)
+            aes_key = cipher_rsa.decrypt(encrypted_key)
+            
+            # Decrypt message with AES
+            cipher_aes = AES.new(aes_key, AES.MODE_CBC, iv)
+            decrypted_data = unpad(cipher_aes.decrypt(encrypted_data), AES.block_size)
+            final_message = decrypted_data.decode('utf-8')
         
         # Cleanup
         cleanup_old_files(app.config['UPLOAD_FOLDER'])
         
+        logger.info(f"[DECODE] Success! Message length: {len(final_message)} chars")
+        
         return jsonify({
             'success': True,
-            'message': message
+            'message': final_message
         })
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_msg = str(e)
+        traceback_str = traceback.format_exc()
+        
+        logger.error(f"[DECODE ERROR] {error_msg}")
+        logger.error(f"[DECODE TRACEBACK]\n{traceback_str}")
+        
+        # Cleanup on error
+        try:
+            if stego_path and os.path.exists(stego_path):
+                os.remove(stego_path)
+        except:
+            pass
+        
+        return jsonify({'error': error_msg, 'traceback': traceback_str}), 500
 
 
 @app.route('/reverse', methods=['POST'])
@@ -277,7 +440,11 @@ def reverse():
     Form data:
     - stego_image: stego image file
     """
+    stego_path = None
+    recovered_path = None
+    
     try:
+        logger.info("[REVERSE] Starting reverse operation...")
         if 'stego_image' not in request.files:
             return jsonify({'error': 'No stego image provided'}), 400
         
@@ -299,14 +466,18 @@ def reverse():
         recovered_filename = f"{unique_id}_recovered.png"
         recovered_path = os.path.join(app.config['OUTPUT_FOLDER'], recovered_filename)
         
+        logger.info(f"[REVERSE] Using model: {BEST_MODEL_PATH or 'random weights'}")
         reverse_hiding(
             stego_image_path=stego_path,
-            output_path=recovered_path
+            output_path=recovered_path,
+            model_path=BEST_MODEL_PATH
         )
         
         # Cleanup
         cleanup_old_files(app.config['UPLOAD_FOLDER'])
         cleanup_old_files(app.config['OUTPUT_FOLDER'])
+        
+        logger.info(f"[REVERSE] Success! Recovered image: {recovered_path}")
         
         return send_file(
             recovered_path,
@@ -316,7 +487,22 @@ def reverse():
         )
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_msg = str(e)
+        traceback_str = traceback.format_exc()
+        
+        logger.error(f"[REVERSE ERROR] {error_msg}")
+        logger.error(f"[REVERSE TRACEBACK]\n{traceback_str}")
+        
+        # Cleanup on error
+        try:
+            if stego_path and os.path.exists(stego_path):
+                os.remove(stego_path)
+            if recovered_path and os.path.exists(recovered_path):
+                os.remove(recovered_path)
+        except:
+            pass
+        
+        return jsonify({'error': error_msg, 'traceback': traceback_str}), 500
 
 
 @app.route('/compare', methods=['POST'])
@@ -328,7 +514,11 @@ def compare():
     - image1: first image file
     - image2: second image file
     """
+    img1_path = None
+    img2_path = None
+    
     try:
+        logger.info("[COMPARE] Starting image comparison...")
         if 'image1' not in request.files or 'image2' not in request.files:
             return jsonify({'error': 'Both images required'}), 400
         
@@ -367,6 +557,8 @@ def compare():
         # Cleanup
         cleanup_old_files(app.config['UPLOAD_FOLDER'])
         
+        logger.info(f"[COMPARE] Success! PSNR={psnr_value:.2f}, SSIM={ssim_value:.4f}, MSE={mse_value:.2f}")
+        
         return jsonify({
             'success': True,
             'metrics': {
@@ -377,7 +569,22 @@ def compare():
         })
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_msg = str(e)
+        traceback_str = traceback.format_exc()
+        
+        logger.error(f"[COMPARE ERROR] {error_msg}")
+        logger.error(f"[COMPARE TRACEBACK]\n{traceback_str}")
+        
+        # Cleanup on error
+        try:
+            if img1_path and os.path.exists(img1_path):
+                os.remove(img1_path)
+            if img2_path and os.path.exists(img2_path):
+                os.remove(img2_path)
+        except:
+            pass
+        
+        return jsonify({'error': error_msg, 'traceback': traceback_str}), 500
 
 
 @app.route('/genrsa', methods=['POST'])
@@ -388,7 +595,11 @@ def genrsa():
     Form data:
     - key_size: key size in bits (1024, 2048, 3072, 4096)
     """
+    keys_dir = None
+    zip_path = None
+    
     try:
+        logger.info("[GENRSA] Starting RSA key generation...")
         if not CRYPTO_AVAILABLE:
             return jsonify({'error': 'Crypto library not available'}), 500
         
@@ -448,6 +659,8 @@ IMPORTANT: Keep private_key.pem secure and never share it!
         cleanup_old_files(app.config['KEYS_FOLDER'])
         cleanup_old_files(app.config['OUTPUT_FOLDER'])
         
+        logger.info(f"[GENRSA] Success! Generated {key_size}-bit RSA keys")
+        
         return send_file(
             zip_path,
             mimetype='application/zip',
@@ -456,7 +669,22 @@ IMPORTANT: Keep private_key.pem secure and never share it!
         )
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_msg = str(e)
+        traceback_str = traceback.format_exc()
+        
+        logger.error(f"[GENRSA ERROR] {error_msg}")
+        logger.error(f"[GENRSA TRACEBACK]\n{traceback_str}")
+        
+        # Cleanup on error
+        try:
+            if keys_dir and os.path.exists(keys_dir):
+                shutil.rmtree(keys_dir)
+            if zip_path and os.path.exists(zip_path):
+                os.remove(zip_path)
+        except:
+            pass
+        
+        return jsonify({'error': error_msg, 'traceback': traceback_str}), 500
 
 
 @app.route('/files/<filename>', methods=['GET'])
@@ -473,26 +701,45 @@ def serve_file(filename):
         if not os.path.exists(file_path):
             return jsonify({'error': 'File not found'}), 404
         
+        logger.info(f"[FILES] Serving file: {filename}")
+        
         return send_file(
             file_path,
             mimetype='image/png'
         )
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        error_msg = str(e)
+        logger.error(f"[FILES ERROR] {error_msg}")
+        return jsonify({'error': error_msg}), 500
 
 
 if __name__ == '__main__':
-    print("CustomGANStego API Server")
-    print("=" * 50)
-    print("Endpoints:")
-    print("  POST /encode         - Hide message in image")
-    print("  POST /decode         - Extract message from image (file or URL)")
-    print("  POST /reverse        - Recover original image")
-    print("  POST /compare        - Compare two images")
-    print("  POST /genrsa         - Generate RSA key pair")
-    print("  GET  /files/<name>   - Serve output files")
-    print("  GET  /health         - Health check")
-    print("=" * 50)
+    try:
+        logger.info("=" * 50)
+        logger.info("CustomGANStego API Server")
+        logger.info("=" * 50)
+        logger.info("Endpoints:")
+        logger.info("  POST /encode         - Hide message in image")
+        logger.info("  POST /decode         - Extract message from image (file or URL)")
+        logger.info("  POST /reverse        - Recover original image")
+        logger.info("  POST /compare        - Compare two images")
+        logger.info("  POST /genrsa         - Generate RSA key pair")
+        logger.info("  GET  /files/<name>   - Serve output files")
+        logger.info("  GET  /health         - Health check")
+        logger.info("=" * 50)
+        logger.info("")
+        logger.info("Server running at: http://localhost:3012")
+        logger.info("Logging to: stegan_api.log")
+        logger.info("")
+        
+        app.run(host='0.0.0.0', port=3012, debug=True)
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    except Exception as e:
+        logger.critical("=" * 50)
+        logger.critical("FATAL ERROR - Server failed to start")
+        logger.critical("=" * 50)
+        logger.critical(f"Error: {e}")
+        logger.critical(f"Traceback:\n{traceback.format_exc()}")
+        logger.critical("=" * 50)
+        sys.exit(1)

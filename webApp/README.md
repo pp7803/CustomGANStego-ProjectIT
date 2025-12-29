@@ -95,6 +95,7 @@ return_url: true (optional, default=true)
 ```
 
 Response (when return_url=true):
+
 ```json
 {
   "success": true,
@@ -123,6 +124,7 @@ private_key: [file] (if use_decryption=true)
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -188,6 +190,7 @@ Returns the image file from server outputs folder.
 ### Using cURL
 
 **Encode (return URL):**
+
 ```bash
 curl -X POST http://localhost:5000/encode \
   -F "cover_image=@cover.png" \
@@ -196,6 +199,7 @@ curl -X POST http://localhost:5000/encode \
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -205,6 +209,7 @@ Response:
 ```
 
 **Encode (download file):**
+
 ```bash
 curl -X POST http://localhost:5000/encode \
   -F "cover_image=@cover.png" \
@@ -214,12 +219,14 @@ curl -X POST http://localhost:5000/encode \
 ```
 
 **Decode from uploaded file:**
+
 ```bash
 curl -X POST http://localhost:5000/decode \
   -F "stego_image=@stego.png"
 ```
 
 **Decode from URL:**
+
 ```bash
 curl -X POST http://localhost:5000/decode \
   -F "stego_url=http://example.com/stego.png"
@@ -249,28 +256,58 @@ curl -X POST http://localhost:5000/genrsa \
   -o keys.zip
 ```
 
+**Get file from server:**
+
+```bash
+curl http://localhost:5000/files/abc123_stego.png -o downloaded.png
+```
+
 ### Using Python
 
 ```python
 import requests
 
-# Encode
+# Encode - get URL
 with open('cover.png', 'rb') as f:
     response = requests.post(
         'http://localhost:5000/encode',
         files={'cover_image': f},
-        data={'message': 'Secret message'}
+        data={
+            'message': 'Secret message',
+            'return_url': 'true'
+        }
+    )
+    result = response.json()
+    stego_url = result['stego_url']
+    print(f"Stego image URL: {stego_url}")
+
+# Encode - download file
+with open('cover.png', 'rb') as f:
+    response = requests.post(
+        'http://localhost:5000/encode',
+        files={'cover_image': f},
+        data={
+            'message': 'Secret message',
+            'return_url': 'false'
+        }
     )
     with open('stego.png', 'wb') as out:
         out.write(response.content)
 
-# Decode
+# Decode from file
 with open('stego.png', 'rb') as f:
     response = requests.post(
         'http://localhost:5000/decode',
         files={'stego_image': f}
     )
     print(response.json()['message'])
+
+# Decode from URL
+response = requests.post(
+    'http://localhost:5000/decode',
+    data={'stego_url': 'http://example.com/stego.png'}
+)
+print(response.json()['message'])
 ```
 
 ## Configuration

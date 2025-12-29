@@ -4,12 +4,12 @@
 
 ## Features
 
-- **📝 Encode** - Giấu tin vào ảnh với GAN
-- **🔍 Decode** - Trích xuất tin từ ảnh stego
-- **⏮️ Reverse** - Khôi phục ảnh gốc (lossless)
-- **🔑 GenRSA** - Tạo khóa RSA cho mã hóa
-- **📊 Compare** - Tính PSNR/SSIM/MSE metrics
-- **🔒 Encryption** - RSA+AES hybrid encryption
+- **Encode Encode** - Giấu tin vào ảnh với GAN
+- **Decode Decode** - Trích xuất tin từ ảnh stego
+- **Reverse Reverse** - Khôi phục ảnh gốc (lossless)
+- **GenRSA GenRSA** - Tạo khóa RSA cho mã hóa
+- **Compare Compare** - Tính PSNR/SSIM/MSE metrics
+- **Security Encryption** - RSA+AES hybrid encryption
 
 ## Quick Start
 
@@ -28,13 +28,13 @@ chmod +x build_app.sh
 
 Script sẽ tự động:
 
-1. ✅ Kiểm tra Python và dependencies
-2. ✅ Tạo/activate virtual environment
-3. ✅ Cài đặt packages thiếu
-4. ✅ Kiểm tra model files
-5. ✅ Build app bundle
-6. ✅ Tạo DMG installer
-7. ✅ Hướng dẫn sử dụng
+1.  Kiểm tra Python và dependencies
+2.  Tạo/activate virtual environment
+3.  Cài đặt packages thiếu
+4.  Kiểm tra model files
+5.  Build app bundle
+6.  Tạo DMG installer
+7.  Hướng dẫn sử dụng
 
 ### Install from DMG (Recommended)
 
@@ -60,7 +60,7 @@ source ../prjvenv/bin/activate
 python steganography_app.py
 ```
 
-## 📦 Requirements
+## Requirements Requirements
 
 ```
 torch>=2.0.0
@@ -77,49 +77,49 @@ pyinstaller>=5.10.0
 
 Auto-installed by `build_app.sh`
 
-## 📖 Usage Guide
+##  Usage Guide
 
 ### 1. Encode (Giấu tin)
 
-1. Tab **📝 Encode**
+1. Tab **Encode Encode**
 2. Chọn ảnh cover
 3. Nhập tin nhắn
 4. (Optional) Enable RSA+AES encryption
-5. Click **🚀 Encode**
+5. Click **Encode Encode**
 6. Lưu ảnh stego
 
 ### 2. Decode (Trích xuất)
 
-1. Tab **🔍 Decode**
+1. Tab **Decode Decode**
 2. Chọn ảnh stego
 3. (If encrypted) Enable decryption + chọn private key
-4. Click **🔍 Decode**
+4. Click **Decode Decode**
 5. Xem tin nhắn
 
 ### 3. Reverse (Khôi phục)
 
-1. Tab **⏮️ Reverse**
+1. Tab **Reverse Reverse**
 2. Chọn ảnh stego
-3. Click **⏮️ Reverse**
+3. Click **Reverse Reverse**
 4. Lưu ảnh recovered
 
 ### 4. GenRSA (Tạo khóa)
 
-1. Tab **🔑 GenRSA**
+1. Tab **GenRSA GenRSA**
 2. Chọn key size (2048 bits recommended)
 3. Chọn thư mục lưu
-4. Click **🔑 Tạo khóa**
+4. Click **GenRSA Tạo khóa**
 5. Nhận public_key.pem + private_key.pem
 
 ### 5. Compare (So sánh)
 
-1. Tab **📊 Compare**
+1. Tab **Compare Compare**
 2. Chọn 2 ảnh
-3. Click **📊 Tính Metrics**
+3. Click **Compare Tính Metrics**
 4. Xem PSNR/SSIM/MSE
 5. (Optional) Lưu comparison image
 
-## 🎯 Workflow Examples
+##  Workflow Examples
 
 ### Basic Steganography
 
@@ -174,7 +174,7 @@ python train.py  # Train models first
 pip install -r requirements.txt
 ```
 
-## 📁 Structure
+##  Structure
 
 ```
 macOSApp/
@@ -187,7 +187,7 @@ macOSApp/
     └── CustomGANStego.app    # macOS app bundle
 ```
 
-## 🔒 Security Notes
+## Security Security Notes
 
 - **Private key**: KHÔNG chia sẻ
 - **Public key**: Có thể chia sẻ công khai
@@ -208,29 +208,29 @@ Project CustomGANStego - CNTT
 
 ---
 
-**Built with ❤️ using PyTorch, scikit-image, and PyInstaller**
+**Built with ️ using PyTorch, scikit-image, and PyInstaller**
 
 For more info, see parent project README.
 
 ## Tính năng
 
-- **📝 Encode (Giấu tin)**: Nhúng tin nhắn bí mật vào ảnh với GAN
-- **🔍 Decode (Trích xuất)**: Trích xuất tin nhắn từ ảnh stego
-- **⏮️ Reverse Hiding**: Khôi phục ảnh gốc từ ảnh stego (lossless recovery)
-- **🔑 GenRSA**: Tạo cặp khóa RSA cho mã hóa
-- **📊 Compare & Metrics**: So sánh ảnh và tính PSNR/SSIM/MSE
-- **🔒 RSA + AES Encryption**: Mã hóa hybrid cho bảo mật cao
-- **🖼️ Visual Comparison**: Hiển thị ảnh comparison với difference maps
+- **Encode Encode (Giấu tin)**: Nhúng tin nhắn bí mật vào ảnh với GAN
+- **Decode Decode (Trích xuất)**: Trích xuất tin nhắn từ ảnh stego
+- **Reverse Reverse Hiding**: Khôi phục ảnh gốc từ ảnh stego (lossless recovery)
+- **GenRSA GenRSA**: Tạo cặp khóa RSA cho mã hóa
+- **Compare Compare & Metrics**: So sánh ảnh và tính PSNR/SSIM/MSE
+- **Security RSA + AES Encryption**: Mã hóa hybrid cho bảo mật cao
+- **️ Visual Comparison**: Hiển thị ảnh comparison với difference maps
 
 ## Giao diện
 
 App có 5 tabs chính:
 
-1. **📝 Encode** - Giấu tin vào ảnh
-2. **🔍 Decode** - Trích xuất tin từ ảnh
-3. **⏮️ Reverse** - Khôi phục ảnh gốc
-4. **🔑 GenRSA** - Tạo khóa RSA
-5. **📊 Compare** - So sánh và tính metrics
+1. **Encode Encode** - Giấu tin vào ảnh
+2. **Decode Decode** - Trích xuất tin từ ảnh
+3. **Reverse Reverse** - Khôi phục ảnh gốc
+4. **GenRSA GenRSA** - Tạo khóa RSA
+5. **Compare Compare** - So sánh và tính metrics
 
 ## Cài đặt và Build
 
@@ -275,7 +275,7 @@ cp -r dist/CustomGANStego.app /Applications/
 open /Applications/CustomGANStego.app
 ```
 
-## 📦 Requirements
+## Requirements Requirements
 
 ```
 torch>=2.0.0              # Deep Learning framework
@@ -290,7 +290,7 @@ reedsolo>=1.7.0           # Error correction
 pyinstaller>=5.10.0       # Build tool
 ```
 
-## 📖 Hướng dẫn sử dụng chi tiết
+##  Hướng dẫn sử dụng chi tiết
 
 ### 1. Encode - Giấu tin vào ảnh
 
@@ -306,12 +306,12 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 3:** (Tùy chọn) Bật mã hóa
 
-- Check ✅ "Sử dụng mã hóa RSA+AES"
+- Check  "Sử dụng mã hóa RSA+AES"
 - Chọn public key (.pem file)
 
 **Bước 4:** Encode
 
-- Click "🚀 Encode"
+- Click "Encode Encode"
 - Chọn nơi lưu ảnh stego
 - Đợi quá trình hoàn tất
 
@@ -328,17 +328,17 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 2:** (Nếu có mã hóa) Giải mã
 
-- Check ✅ "Giải mã RSA+AES"
+- Check  "Giải mã RSA+AES"
 - Chọn private key (.pem file)
 
 **Bước 3:** Decode
 
-- Click "🔍 Decode"
+- Click "Decode Decode"
 - Tin nhắn sẽ hiển thị trong text box
 
 **Bước 4:** Lưu kết quả (optional)
 
-- Click "💾 Save"
+- Click "Save Save"
 - Lưu tin nhắn ra file .txt
 
 ---
@@ -352,7 +352,7 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 2:** Reverse
 
-- Click "⏮️ Reverse"
+- Click "Reverse Reverse"
 - Chọn nơi lưu ảnh đã khôi phục
 - Đợi quá trình xử lý
 
@@ -363,7 +363,7 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 4:** Lưu (optional)
 
-- Click "💾 Save" để lưu lại file
+- Click "Save Save" để lưu lại file
 
 ---
 
@@ -371,10 +371,10 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 1:** Chọn độ dài khóa
 
-- ⚪ 1024 bits - Nhanh, bảo mật thấp
-- ⚪ 2048 bits - ✅ Khuyến nghị (default)
-- ⚪ 3072 bits - Bảo mật cao
-- ⚪ 4096 bits - Bảo mật rất cao, chậm hơn
+-  1024 bits - Nhanh, bảo mật thấp
+-  2048 bits -  Khuyến nghị (default)
+-  3072 bits - Bảo mật cao
+-  4096 bits - Bảo mật rất cao, chậm hơn
 
 **Bước 2:** Chọn thư mục lưu
 
@@ -383,13 +383,13 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 3:** Tạo khóa
 
-- Click "🔑 Tạo khóa"
+- Click "GenRSA Tạo khóa"
 - Đợi quá trình tạo khóa
 
 **Kết quả:**
 
 - `public_key.pem` - Dùng để mã hóa (có thể chia sẻ)
-- `private_key.pem` - Dùng để giải mã (⚠️ GIỮ BÍ MẬT!)
+- `private_key.pem` - Dùng để giải mã ( GIỮ BÍ MẬT!)
 
 ---
 
@@ -402,7 +402,7 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 2:** Tính metrics
 
-- Click "📊 Tính Metrics"
+- Click "Compare Tính Metrics"
 - Đợi tính toán
 
 **Kết quả hiển thị:**
@@ -410,13 +410,13 @@ pyinstaller>=5.10.0       # Build tool
 **Metrics:**
 
 - **PSNR** (Peak Signal-to-Noise Ratio)
-  - > 40 dB: ✅ Chất lượng rất tốt
-  - > 30 dB: ✓ Chất lượng tốt
-  - < 30 dB: ⚠️ Chất lượng trung bình
+  - > 40 dB:  Chất lượng rất tốt
+  - > 30 dB:  Chất lượng tốt
+  - < 30 dB:  Chất lượng trung bình
 - **SSIM** (Structural Similarity Index)
-  - > 0.95: ✅ Tương đồng rất cao
-  - > 0.90: ✓ Tương đồng cao
-  - < 0.90: ⚠️ Tương đồng trung bình
+  - > 0.95:  Tương đồng rất cao
+  - > 0.90:  Tương đồng cao
+  - < 0.90:  Tương đồng trung bình
 - **MSE** (Mean Squared Error)
   - Càng nhỏ càng tốt
 
@@ -427,12 +427,12 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 3:** Lưu kết quả
 
-- Click "💾 Save PNG"
+- Click "Save Save PNG"
 - Lưu ảnh comparison để báo cáo
 
 ---
 
-## 🎯 Workflow điển hình
+##  Workflow điển hình
 
 ### Scenario 1: Giấu tin đơn giản (không mã hóa)
 
@@ -462,13 +462,13 @@ pyinstaller>=5.10.0       # Build tool
 2. Encode tab:
    - Chọn cover.png
    - Nhập: "Secret message"
-   - ✅ Mã hóa RSA+AES
+   -  Mã hóa RSA+AES
    - Chọn public_key.pem
    - Encode → encrypted_stego.png
 
 3. Decode tab:
    - Chọn encrypted_stego.png
-   - ✅ Giải mã RSA+AES
+   -  Giải mã RSA+AES
    - Chọn private_key.pem
    - Decode → "Secret message"
 ```
@@ -533,7 +533,7 @@ open dist/CustomGANStego.app
 
 ---
 
-## 📁 Cấu trúc thư mục
+##  Cấu trúc thư mục
 
 ```
 macOSApp/
@@ -550,9 +550,9 @@ macOSApp/
 
 ---
 
-## 🔒 Bảo mật
+## Security Bảo mật
 
-**⚠️ LƯU Ý QUAN TRỌNG:**
+** LƯU Ý QUAN TRỌNG:**
 
 1. **Private key:** KHÔNG bao giờ chia sẻ private key
 2. **Public key:** Có thể chia sẻ công khai
@@ -578,22 +578,22 @@ Alice                          Bob
 
 | Phương pháp        | PSNR   | SSIM  | Dung lượng | Tốc độ     | Reverse  |
 | ------------------ | ------ | ----- | ---------- | ---------- | -------- |
-| **CustomGANStego** | 40+ dB | 0.99+ | Cao        | Nhanh      | ✅ Có    |
-| LSB                | 50+ dB | 0.99+ | Thấp       | Rất nhanh  | ❌ Không |
-| DCT-based          | 40+ dB | 0.95+ | Trung bình | Trung bình | ❌ Không |
-| DWT-based          | 35+ dB | 0.93+ | Trung bình | Chậm       | ❌ Không |
+| **CustomGANStego** | 40+ dB | 0.99+ | Cao        | Nhanh      |  Có    |
+| LSB                | 50+ dB | 0.99+ | Thấp       | Rất nhanh  |  Không |
+| DCT-based          | 40+ dB | 0.95+ | Trung bình | Trung bình |  Không |
+| DWT-based          | 35+ dB | 0.93+ | Trung bình | Chậm       |  Không |
 
 **Ưu điểm CustomGANStego:**
 
-- ✅ Khả năng reverse (khôi phục ảnh gốc)
-- ✅ PSNR cao (>45 dB)
-- ✅ SSIM rất cao (>0.99)
-- ✅ Chống steganalysis tốt nhờ GAN
-- ✅ Tích hợp mã hóa RSA+AES
+-  Khả năng reverse (khôi phục ảnh gốc)
+-  PSNR cao (>45 dB)
+-  SSIM rất cao (>0.99)
+-  Chống steganalysis tốt nhờ GAN
+-  Tích hợp mã hóa RSA+AES
 
 ---
 
-## 🎓 Tài liệu tham khảo
+##  Tài liệu tham khảo
 
 - **Paper:** "Hiding Images in Plain Sight: Deep Steganography" (Baluja, 2017)
 - **GAN:** "Generative Adversarial Networks" (Goodfellow et al., 2014)
@@ -601,7 +601,7 @@ Alice                          Bob
 
 ---
 
-## 👨‍💻 Development
+## ‍ Development
 
 ### Run with debugging
 
@@ -630,7 +630,7 @@ Project CustomGANStego - CNTT
 
 ---
 
-## 🙏 Credits
+##  Credits
 
 - PyTorch Team
 - scikit-image
@@ -640,9 +640,9 @@ Project CustomGANStego - CNTT
 
 ---
 
-**Chúc bạn sử dụng app thành công! 🚀**
+**Chúc bạn sử dụng app thành công! Encode**
 
-Nếu có vấn đề, vui lòng mở issue trên GitHub. 3. Chọn đường dẫn output cho ảnh recovered 4. Click **🔄 Recover Cover Image**
+Nếu có vấn đề, vui lòng mở issue trên GitHub. 3. Chọn đường dẫn output cho ảnh recovered 4. Click ** Recover Cover Image**
 
 ### 4. Cài đặt (Settings)
 

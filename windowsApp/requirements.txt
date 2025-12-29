@@ -18,6 +18,9 @@ pycryptodome>=3.17.0
 # Error Correction
 reedsolo>=1.7.0
 
+# System Monitoring
+psutil>=5.9.0
+
 # GUI (included in Python 3)
 # tkinter - built-in
 

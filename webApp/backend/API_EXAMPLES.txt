@@ -1,0 +1,64 @@
+CustomGANStego API - Quick Examples
+====================================
+
+ENCODE - Get URL (default behavior)
+-----------------------------------
+curl -X POST http://localhost:5000/encode \
+  -F "cover_image=@test.png" \
+  -F "message=Hello World"
+
+Response:
+{
+  "success": true,
+  "stego_url": "http://localhost:5000/files/abc123_stego.png",
+  "filename": "abc123_stego.png"
+}
+
+ENCODE - Download file directly
+--------------------------------
+curl -X POST http://localhost:5000/encode \
+  -F "cover_image=@test.png" \
+  -F "message=Hello World" \
+  -F "return_url=false" \
+  -o stego.png
+
+DECODE - From uploaded file
+---------------------------
+curl -X POST http://localhost:5000/decode \
+  -F "stego_image=@stego.png"
+
+Response:
+{
+  "success": true,
+  "message": "Hello World"
+}
+
+DECODE - From URL (NEW!)
+------------------------
+curl -X POST http://localhost:5000/decode \
+  -F "stego_url=http://example.com/image.png"
+
+Response:
+{
+  "success": true,
+  "message": "Hello World"
+}
+
+GET FILE - Download from server
+--------------------------------
+curl http://localhost:5000/files/abc123_stego.png -o my_stego.png
+
+FULL WORKFLOW EXAMPLE
+---------------------
+# 1. Encode and get URL
+RESULT=$(curl -s -X POST http://localhost:5000/encode \
+  -F "cover_image=@test.png" \
+  -F "message=My Secret")
+
+STEGO_URL=$(echo $RESULT | jq -r '.stego_url')
+echo "Stego URL: $STEGO_URL"
+
+# 2. Decode from that URL
+curl -X POST http://localhost:5000/decode \
+  -F "stego_url=$STEGO_URL"
+
