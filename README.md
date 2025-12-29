@@ -54,11 +54,13 @@ cd CustomGANStego
 ```
 
 Script sẽ tự động:
+
 - Tạo virtual environment `prjvenv`
 - Cập nhật pip
 - Cài đặt tất cả dependencies từ requirements.txt
 
 Sau khi chạy xong, kích hoạt môi trường:
+
 ```bash
 source prjvenv/bin/activate
 ```
@@ -66,11 +68,13 @@ source prjvenv/bin/activate
 #### Cách 2: Thiết lập thủ công
 
 Tạo virtual environment:
+
 ```bash
 python3 -m venv prjvenv
 ```
 
 Kích hoạt môi trường:
+
 ```bash
 source prjvenv/bin/activate  # macOS/Linux
 # hoặc
@@ -78,6 +82,7 @@ prjvenv\Scripts\activate     # Windows
 ```
 
 Cài đặt dependencies:
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
@@ -86,6 +91,7 @@ pip install -r requirements.txt
 ### 3. Cài đặt dependencies (nếu chưa dùng script)
 
 Các thư viện chính:
+
 - torch
 - torchvision
 - torchmetrics
@@ -96,11 +102,13 @@ Các thư viện chính:
 - pycryptodome (tùy chọn, cho encryption)
 
 **Lưu ý**: Luôn kích hoạt virtual environment trước khi làm việc:
+
 ```bash
 source prjvenv/bin/activate
 ```
 
 Để thoát khỏi môi trường ảo:
+
 ```bash
 deactivate
 ```
@@ -110,6 +118,7 @@ deactivate
 Dataset mặc định: DIV2K
 
 Cấu trúc thư mục:
+
 ```
 div2k/
 ├── train/
@@ -119,6 +128,7 @@ div2k/
 ```
 
 Tải dataset:
+
 ```bash
 bash scripts/download-dataset.sh
 ```
@@ -159,6 +169,7 @@ python train.py
 ```
 
 Model sẽ được lưu trong thư mục `results/model/` với tên format:
+
 ```
 accX.XXXX_psnrXX.XX_ssimX.XXXX_YYYY-MM-DD_HH:MM:SS.dat
 ```
@@ -174,6 +185,7 @@ python plotsummary.py
 ```
 
 Metrics được theo dõi:
+
 - Decoder Accuracy: Độ chính xác trích xuất
 - PSNR: Chất lượng ảnh stego
 - SSIM: Độ tương đồng cấu trúc
@@ -193,6 +205,7 @@ python runstego.py encode <cover_image> "<secret_text>" [options]
 #### Chế độ cơ bản (không mã hóa)
 
 Ví dụ:
+
 ```bash
 python runstego.py encode test.png "This is my secret message"
 ```
@@ -208,11 +221,13 @@ python runstego.py encode cover.png "Secret" --output my_stego.png
 #### Chế độ mã hóa (RSA + AES)
 
 Tạo cặp khóa RSA:
+
 ```bash
 python genRSA.py --bits 2048 --public public_key.pem --private private_key.pem
 ```
 
 Encode với encryption:
+
 ```bash
 python runstego.py encode cover.png "Confidential message" --encrypt --public-key public_key.pem
 ```
@@ -244,6 +259,7 @@ python runstego.py decode <stego_image> [options]
 #### Chế độ cơ bản
 
 Ví dụ:
+
 ```bash
 python runstego.py decode stego_test.png
 ```
@@ -263,6 +279,7 @@ python runstego.py decode stego.png --encrypt --private-key private_key.pem
 ```
 
 Hoặc lưu vào file:
+
 ```bash
 python runstego.py decode stego.png --output secret.txt --encrypt --private-key private_key.pem
 ```
@@ -306,6 +323,7 @@ python compute_metrics.py
 ```
 
 Chỉnh sửa đường dẫn ảnh trong file để so sánh:
+
 - Cover vs Stego: Đánh giá chất lượng giấu tin
 - Cover vs Recovered: Đánh giá khả năng khôi phục
 
@@ -348,6 +366,7 @@ CustomGANStego/
 2. **Memory**: Training yêu cầu GPU với memory đủ lớn. Nếu gặp lỗi OOM (Out of Memory), giảm `batch_size` trong `train.py`
 
 3. **Device**: Hệ thống tự động phát hiện device (CUDA > MPS > CPU). Để force CPU:
+
    ```python
    device = torch.device('cpu')
    ```
@@ -368,6 +387,7 @@ CustomGANStego/
 3. **Model consistency**: Phải dùng cùng model (hoặc model cùng architecture) cho encode và decode
 
 4. **Encryption**:
+
    - Public key cho encoding
    - Private key cho decoding
    - Không mất private key, không thể giải mã
@@ -387,13 +407,14 @@ CustomGANStego/
 
 1. **Decoder Accuracy**: Target >= 95% để đảm bảo trích xuất chính xác
 
-2. **PSNR**: 
-   - >40 dB: Excellent (không nhìn thấy khác biệt)
+2. **PSNR**:
+
+   - > 40 dB: Excellent (không nhìn thấy khác biệt)
    - 35-40 dB: Good (khác biệt rất nhỏ)
    - 30-35 dB: Acceptable (có thể nhận thấy nhẹ)
 
 3. **SSIM**:
-   - >0.95: Excellent
+   - > 0.95: Excellent
    - 0.90-0.95: Good
    - <0.90: Cần cải thiện
 
@@ -402,37 +423,47 @@ CustomGANStego/
 ### Lỗi thường gặp
 
 **1. CUDA Out of Memory**
+
 ```
 RuntimeError: CUDA out of memory
 ```
+
 Giải pháp: Giảm `batch_size` trong `train.py`
 
 **2. Dataset not found**
+
 ```
 FileNotFoundError: div2k/train/images
 ```
+
 Giải pháp: Chạy `bash scripts/download-dataset.sh` hoặc tạo thư mục thủ công
 
 **3. Model not found**
+
 ```
 No model found. Train a model first
 ```
+
 Giải pháp: Chạy `python train.py` để train model
 
 **4. Crypto module not found**
+
 ```
 ModuleNotFoundError: No module named 'Crypto'
 ```
+
 Giải pháp: `pip install pycryptodome`
 
 **5. Decoding accuracy thấp**
 
 Nguyên nhân:
+
 - Model chưa được train đủ
 - Dùng sai model cho decode
 - Ảnh stego bị nén hoặc biến đổi
 
 Giải pháp:
+
 - Train thêm epochs
 - Dùng đúng model đã encode
 - Lưu ảnh stego ở format lossless (PNG)
@@ -440,16 +471,19 @@ Giải pháp:
 ### Tối ưu hóa
 
 **Training nhanh hơn:**
+
 - Tăng `batch_size` nếu GPU memory cho phép
 - Giảm `n_critic` xuống 1-2
 - Tăng learning rate (nhưng cẩn thận với stability)
 
 **Chất lượng cao hơn:**
+
 - Tăng `epochs`
 - Tăng `weight_mse` và `weight_ssim`
 - Giảm `weight_decoder` một chút (trade-off accuracy vs quality)
 
 **Decoder accuracy cao hơn:**
+
 - Tăng `weight_decoder` lên 15-20
 - Giảm các weight khác
 - Train đủ epochs cho convergence

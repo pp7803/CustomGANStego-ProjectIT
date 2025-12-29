@@ -144,12 +144,14 @@ class SteganographyApp:
         self.reverse_tab = ttk.Frame(notebook)
         self.genrsa_tab = ttk.Frame(notebook)
         self.compare_tab = ttk.Frame(notebook)
+        self.debug_tab = ttk.Frame(notebook)
         
         notebook.add(self.encode_tab, text="📝 Encode")
         notebook.add(self.decode_tab, text="🔍 Decode")
         notebook.add(self.reverse_tab, text="⏮️  Reverse")
         notebook.add(self.genrsa_tab, text="🔑 GenRSA")
         notebook.add(self.compare_tab, text="📊 Compare")
+        notebook.add(self.debug_tab, text="🐛 Debug")
         
         # Setup each tab
         self.setup_encode_tab()
@@ -157,10 +159,30 @@ class SteganographyApp:
         self.setup_reverse_tab()
         self.setup_genrsa_tab()
         self.setup_compare_tab()
+        self.setup_debug_tab()
+        
+        # Setup console output redirection
+        self.setup_console_redirect()
         
     def setup_encode_tab(self):
         """Setup Encode tab"""
-        frame = ttk.Frame(self.encode_tab, padding=20)
+        # Create canvas and scrollbar for scrolling
+        canvas = tk.Canvas(self.encode_tab)
+        scrollbar = ttk.Scrollbar(self.encode_tab, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        frame = ttk.Frame(scrollable_frame, padding=20)
         frame.pack(fill='both', expand=True)
         
         # Title
@@ -218,7 +240,23 @@ class SteganographyApp:
         
     def setup_decode_tab(self):
         """Setup Decode tab"""
-        frame = ttk.Frame(self.decode_tab, padding=20)
+        # Create canvas and scrollbar for scrolling
+        canvas = tk.Canvas(self.decode_tab)
+        scrollbar = ttk.Scrollbar(self.decode_tab, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        frame = ttk.Frame(scrollable_frame, padding=20)
         frame.pack(fill='both', expand=True)
         
         # Title
@@ -277,7 +315,23 @@ class SteganographyApp:
         
     def setup_reverse_tab(self):
         """Setup Reverse tab"""
-        frame = ttk.Frame(self.reverse_tab, padding=20)
+        # Create canvas and scrollbar for scrolling
+        canvas = tk.Canvas(self.reverse_tab)
+        scrollbar = ttk.Scrollbar(self.reverse_tab, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        frame = ttk.Frame(scrollable_frame, padding=20)
         frame.pack(fill='both', expand=True)
         
         # Title
@@ -334,7 +388,23 @@ class SteganographyApp:
         
     def setup_genrsa_tab(self):
         """Setup GenRSA tab"""
-        frame = ttk.Frame(self.genrsa_tab, padding=20)
+        # Create canvas and scrollbar for scrolling
+        canvas = tk.Canvas(self.genrsa_tab)
+        scrollbar = ttk.Scrollbar(self.genrsa_tab, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        frame = ttk.Frame(scrollable_frame, padding=20)
         frame.pack(fill='both', expand=True)
         
         # Title
@@ -379,7 +449,23 @@ class SteganographyApp:
         
     def setup_compare_tab(self):
         """Setup Compare tab"""
-        frame = ttk.Frame(self.compare_tab, padding=20)
+        # Create canvas and scrollbar for scrolling
+        canvas = tk.Canvas(self.compare_tab)
+        scrollbar = ttk.Scrollbar(self.compare_tab, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        frame = ttk.Frame(scrollable_frame, padding=20)
         frame.pack(fill='both', expand=True)
         
         # Title
@@ -755,6 +841,127 @@ class SteganographyApp:
         
         threading.Thread(target=genrsa_thread, daemon=True).start()
         
+    # ==================== DEBUG TAB METHODS ====================
+    
+    def setup_debug_tab(self):
+        """Setup Debug tab"""
+        frame = ttk.Frame(self.debug_tab, padding=20)
+        frame.pack(fill='both', expand=True)
+        
+        # Title
+        title = ttk.Label(frame, text="Debug - Console Log", 
+                         font=('Helvetica', 18, 'bold'))
+        title.pack(pady=(0, 10))
+        
+        # Control buttons
+        btn_frame = ttk.Frame(frame)
+        btn_frame.pack(fill='x', pady=5)
+        
+        ttk.Button(btn_frame, text="🔄 Refresh", 
+                  command=self.refresh_debug_log).pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="🧹 Clear", 
+                  command=self.clear_debug_log).pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="💾 Save Log", 
+                  command=self.save_debug_log).pack(side='left', padx=5)
+        
+        # Auto-refresh checkbox
+        self.auto_refresh = tk.BooleanVar(value=True)
+        ttk.Checkbutton(btn_frame, text="Auto-refresh", 
+                       variable=self.auto_refresh).pack(side='left', padx=20)
+        
+        # Log display
+        log_frame = ttk.LabelFrame(frame, text="Console Output", padding=10)
+        log_frame.pack(fill='both', expand=True, pady=10)
+        
+        self.debug_log = scrolledtext.ScrolledText(log_frame, height=25, wrap=tk.WORD,
+                                                    font=('Courier', 10))
+        self.debug_log.pack(fill='both', expand=True)
+        
+        # Status
+        self.debug_status = ttk.Label(frame, text="Console logging active", foreground='green')
+        self.debug_status.pack(pady=5)
+        
+        # Storage for log messages
+        self.log_messages = []
+        
+    def setup_console_redirect(self):
+        """Redirect stdout and stderr to capture console output"""
+        import sys
+        
+        class ConsoleRedirect:
+            def __init__(self, text_widget, original_stream, log_storage):
+                self.text_widget = text_widget
+                self.original_stream = original_stream
+                self.log_storage = log_storage
+                
+            def write(self, message):
+                # Store all messages, even empty ones for proper formatting
+                self.log_storage.append(message)
+                if hasattr(self, 'text_widget') and self.text_widget:
+                    try:
+                        self.text_widget.insert(tk.END, message)
+                        self.text_widget.see(tk.END)
+                    except:
+                        pass
+                # Also write to original stream
+                self.original_stream.write(message)
+                self.original_stream.flush()
+                
+            def flush(self):
+                self.original_stream.flush()
+        
+        # Redirect stdout and stderr
+        sys.stdout = ConsoleRedirect(self.debug_log, sys.__stdout__, self.log_messages)
+        sys.stderr = ConsoleRedirect(self.debug_log, sys.__stderr__, self.log_messages)
+        
+        # Start auto-refresh timer
+        self.auto_refresh_debug()
+        
+    def auto_refresh_debug(self):
+        """Auto-refresh debug log every 1 second if enabled"""
+        if self.auto_refresh.get():
+            self.refresh_debug_log()
+        # Schedule next refresh
+        self.root.after(1000, self.auto_refresh_debug)
+        
+    def refresh_debug_log(self):
+        """Refresh the debug log display"""
+        # Already auto-updated via ConsoleRedirect, just scroll to bottom
+        try:
+            self.debug_log.see(tk.END)
+            count = len(self.log_messages)
+            self.debug_status.config(text=f"Console logging active - {count} messages", 
+                                    foreground='green')
+        except:
+            pass
+            
+    def clear_debug_log(self):
+        """Clear the debug log"""
+        self.debug_log.delete('1.0', tk.END)
+        self.log_messages.clear()
+        self.debug_status.config(text="Log cleared", foreground='blue')
+        
+    def save_debug_log(self):
+        """Save debug log to file"""
+        content = self.debug_log.get('1.0', tk.END).strip()
+        if not content:
+            messagebox.showwarning("Cảnh báo", "Không có log để lưu!")
+            return
+            
+        from datetime import datetime
+        default_name = f"debug_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        
+        path = filedialog.asksaveasfilename(
+            title="Lưu debug log",
+            defaultextension=".txt",
+            initialfile=default_name,
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+        )
+        if path:
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            messagebox.showinfo("Thành công", f"Đã lưu log vào:\n{path}")
+    
     # ==================== COMPARE TAB METHODS ====================
     
     def select_compare_img1(self):

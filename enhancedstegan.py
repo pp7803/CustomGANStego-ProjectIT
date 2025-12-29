@@ -4,7 +4,13 @@ import torch
 import torch.nn as nn
 from PIL import Image
 import numpy as np
-from imageio import imread, imwrite
+try:
+    from imageio import imread, imwrite
+except ImportError:
+    # For imageio v3+
+    import imageio.v2 as imageio
+    imread = imageio.imread
+    imwrite = imageio.imwrite
 import zlib
 from reedsolo import RSCodec
 from collections import Counter

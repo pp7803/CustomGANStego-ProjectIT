@@ -18,11 +18,13 @@
 GAN là một framework học sâu được Ian Goodfellow và cộng sự giới thiệu năm 2014. GAN bao gồm hai mạng neural networks cạnh tranh với nhau:
 
 **Generator (G)**: Mạng tạo dữ liệu giả từ noise hoặc input
+
 - Input: Vector ngẫu nhiên hoặc dữ liệu cần transform
 - Output: Dữ liệu synthetic (ảnh, âm thanh, text,...)
 - Mục tiêu: Tạo dữ liệu giống thật nhất có thể để đánh lừa Discriminator
 
 **Discriminator (D)**: Mạng phân biệt dữ liệu thật và giả
+
 - Input: Dữ liệu (có thể là thật hoặc giả)
 - Output: Xác suất dữ liệu là thật [0, 1]
 - Mục tiêu: Phân biệt chính xác giữa dữ liệu thật và dữ liệu từ Generator
@@ -32,11 +34,13 @@ GAN là một framework học sâu được Ian Goodfellow và cộng sự giớ
 GAN được training theo cơ chế "adversarial" (đối kháng):
 
 1. **Bước 1**: Discriminator được train trước
+
    - Nhận dữ liệu thật → output gần 1
    - Nhận dữ liệu giả từ Generator → output gần 0
    - Mục tiêu: Maximize khả năng phân biệt
 
 2. **Bước 2**: Generator được train
+
    - Tạo dữ liệu giả
    - Nhận feedback từ Discriminator
    - Mục tiêu: Minimize khả năng Discriminator phát hiện ra giả
@@ -54,6 +58,7 @@ min_G max_D V(D,G) = E_x[log D(x)] + E_z[log(1 - D(G(z)))]
 ```
 
 Trong đó:
+
 - `x`: Dữ liệu thật
 - `z`: Noise vector
 - `G(z)`: Dữ liệu giả từ Generator
@@ -61,11 +66,13 @@ Trong đó:
 - `E`: Expected value
 
 **Discriminator loss**:
+
 ```
 L_D = -[log D(x) + log(1 - D(G(z)))]
 ```
 
 **Generator loss**:
+
 ```
 L_G = -log D(G(z))
 ```
@@ -75,11 +82,13 @@ L_G = -log D(G(z))
 Trong bài toán steganography, GAN được ứng dụng để:
 
 **Generator (Encoder)**:
+
 - Input: Ảnh cover + secret message
 - Output: Ảnh stego chứa thông tin ẩn
 - Mục tiêu: Tạo ảnh stego không thể phân biệt với ảnh cover
 
 **Discriminator (Critic)**:
+
 - Input: Ảnh (cover hoặc stego)
 - Output: Score đánh giá ảnh là cover hay stego
 - Mục tiêu: Phát hiện ảnh nào chứa thông tin ẩn
@@ -95,47 +104,53 @@ Cơ chế adversarial buộc Encoder phải tạo ảnh stego có chất lượn
 CNN là kiến trúc neural network chuyên xử lý dữ liệu có cấu trúc grid (ảnh, video):
 
 **Đặc điểm**:
+
 - Supervised learning: Cần labeled data để train
 - Feedforward: Dữ liệu đi một chiều từ input đến output
 - Các layers chính: Conv2D, Pooling, Fully Connected
 - Ứng dụng: Classification, detection, segmentation
 
 **Cấu trúc**:
+
 ```
 Input Image → Conv Layers → Pooling → FC Layers → Output
 ```
 
 **Training**:
+
 - Loss function đơn giản (cross-entropy, MSE)
 - Backpropagation trực tiếp
 - Stable và dễ train hơn GAN
 
 ### 2.2 So sánh GAN vs CNN
 
-| Tiêu chí | CNN | GAN |
-|----------|-----|-----|
-| Mục đích | Phân loại, dự đoán | Sinh dữ liệu mới |
-| Learning type | Supervised | Unsupervised/Semi-supervised |
-| Architecture | Single network | Dual networks (G + D) |
-| Training | Straightforward | Adversarial (khó hơn) |
-| Loss | Direct (MSE, CE) | Minimax game |
-| Stability | Stable | Có thể không ổn định |
-| Output | Label/Value | Synthetic data |
-| Gradient flow | Direct backprop | Through discriminator |
+| Tiêu chí      | CNN                | GAN                          |
+| ------------- | ------------------ | ---------------------------- |
+| Mục đích      | Phân loại, dự đoán | Sinh dữ liệu mới             |
+| Learning type | Supervised         | Unsupervised/Semi-supervised |
+| Architecture  | Single network     | Dual networks (G + D)        |
+| Training      | Straightforward    | Adversarial (khó hơn)        |
+| Loss          | Direct (MSE, CE)   | Minimax game                 |
+| Stability     | Stable             | Có thể không ổn định         |
+| Output        | Label/Value        | Synthetic data               |
+| Gradient flow | Direct backprop    | Through discriminator        |
 
 ### 2.3 Tại sao dùng GAN cho Steganography?
 
 **Ưu điểm của GAN**:
 
 1. **Chất lượng ảnh cao**: Adversarial training buộc encoder phải tạo ảnh stego realistic
+
    - CNN thuần: Chỉ minimize reconstruction loss (MSE, SSIM)
    - GAN: Phải đánh lừa critic → ảnh phải "nhìn" giống thật
 
-2. **Khả năng chống steganalysis**: 
+2. **Khả năng chống steganalysis**:
+
    - Critic đóng vai trò steganalyzer
    - Encoder học cách tránh các artifacts dễ phát hiện
 
 3. **Không cần ground truth hoàn hảo**:
+
    - CNN cần biết chính xác ảnh stego "đúng" là gì
    - GAN chỉ cần biết ảnh cover và message cần ẩn
 
@@ -144,12 +159,14 @@ Input Image → Conv Layers → Pooling → FC Layers → Output
    - CNN optimize cho pixel-wise similarity (máy tính đo)
 
 **Khi nào dùng CNN?**:
+
 - Bài toán classification đơn giản
 - Cần training stable và nhanh
 - Có đủ labeled data
 - Không cần generate dữ liệu mới
 
 **Khi nào dùng GAN?**:
+
 - Cần generate dữ liệu realistic
 - Bài toán steganography, style transfer, super-resolution
 - Cần perceptual quality cao
@@ -160,20 +177,23 @@ Input Image → Conv Layers → Pooling → FC Layers → Output
 CustomGANStego kết hợp cả CNN và GAN:
 
 **CNN components**:
+
 - Encoder: CNN layers để embed message
 - Decoder: CNN layers để extract message
 - Reverse Decoder: CNN layers để recover cover
 
 **GAN components**:
+
 - Critic: Đánh giá chất lượng ảnh stego (adversarial)
 - Training strategy: Minimax game giữa Encoder và Critic
 
 **Hybrid approach**:
+
 ```
 Encoder (CNN) ←─────┐
                     │ Adversarial
 Critic (CNN) ───────┘
-                    
+
 Decoder (CNN) → Message extraction
 Reverse Decoder (CNN) → Cover recovery
 ```
@@ -195,22 +215,26 @@ Reverse Decoder (CNN) → Cover recovery
 WGAN thay đổi loss function để stable hơn:
 
 **Earth Mover's Distance**:
+
 ```
 W(P_r, P_g) = inf_{γ∈Π(P_r,P_g)} E_{(x,y)~γ}[||x - y||]
 ```
 
 **WGAN loss**:
+
 ```
 L_D = E_x[D(x)] - E_z[D(G(z))]
 L_G = E_z[D(G(z))]
 ```
 
 **Ưu điểm**:
+
 - Loss có ý nghĩa: Càng thấp càng tốt
 - Training stable hơn
 - Không bị mode collapse
 
 **Nhược điểm**:
+
 - Cần weight clipping để enforce Lipschitz constraint
 - Weight clipping gây capacity limitation
 
@@ -219,11 +243,13 @@ L_G = E_z[D(G(z))]
 WGAN-GP thay weight clipping bằng gradient penalty:
 
 **Gradient Penalty**:
+
 ```
 λ * E_x̂[(||∇_x̂ D(x̂)||_2 - 1)^2]
 ```
 
 Trong đó:
+
 - `x̂ = αx + (1-α)G(z)`: Interpolation giữa real và fake
 - `α ~ Uniform(0, 1)`
 - `λ`: Penalty coefficient (thường = 10)
@@ -234,13 +260,13 @@ Trong đó:
 def compute_gradient_penalty(critic, real_data, fake_data, device):
     batch_size = real_data.size(0)
     alpha = torch.rand(batch_size, 1, 1, 1, device=device)
-    
+
     # Interpolate giữa real và fake
     interpolates = (alpha * real_data + (1 - alpha) * fake_data).requires_grad_(True)
-    
+
     # Tính critic score
     d_interpolates = critic(interpolates)
-    
+
     # Tính gradient
     gradients = torch.autograd.grad(
         outputs=d_interpolates,
@@ -250,15 +276,16 @@ def compute_gradient_penalty(critic, real_data, fake_data, device):
         retain_graph=True,
         only_inputs=True
     )[0]
-    
+
     # Gradient penalty
     gradients = gradients.view(batch_size, -1)
     gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean()
-    
+
     return gradient_penalty
 ```
 
 **Critic Loss với GP**:
+
 ```python
 critic_loss = generated_score - cover_score + lambda_gp * gradient_penalty
 ```
@@ -320,14 +347,14 @@ class BasicEncoder(nn.Module):
     def __init__(self, data_depth, hidden_size):
         # Conv1: Image branch
         self.conv1 = Conv2d(3 → hidden_size)
-        
+
         # Conv2: Fusion layer (image + message)
         self.conv2 = Conv2d(hidden_size + data_depth → hidden_size)
-        
+
         # Conv3-4: Processing layers
         self.conv3 = Conv2d(hidden_size → hidden_size)
         self.conv4 = Conv2d(hidden_size → 3)
-    
+
     def forward(self, image, data):
         x = conv1(image)              # Extract image features
         x = conv2([x, data])          # Fuse with message
@@ -337,6 +364,7 @@ class BasicEncoder(nn.Module):
 ```
 
 **ResidualEncoder**: Thêm residual connection
+
 ```python
 def forward(self, image, data):
     delta = super().forward(image, data)
@@ -344,11 +372,13 @@ def forward(self, image, data):
 ```
 
 **Ưu điểm residual**:
+
 - Encoder chỉ học difference, dễ hơn
 - Preserve structure của cover image
 - Better gradient flow
 
 **DenseEncoder**: Thêm dense connections (DenseNet style)
+
 ```python
 def forward(self, image, data):
     x1 = conv1(image)
@@ -359,6 +389,7 @@ def forward(self, image, data):
 ```
 
 **Ưu điểm dense**:
+
 - Feature reuse → fewer parameters
 - Better gradient propagation
 - Richer feature combinations
@@ -376,7 +407,7 @@ class BasicDecoder(nn.Module):
         self.conv2 = Conv2d(hidden_size → hidden_size)
         self.conv3 = Conv2d(hidden_size → hidden_size)
         self.conv4 = Conv2d(hidden_size → data_depth)
-    
+
     def forward(self, stego):
         x = conv1(stego)
         x = conv2(x)
@@ -388,6 +419,7 @@ class BasicDecoder(nn.Module):
 **DenseDecoder**: Similar to DenseEncoder, dùng dense connections
 
 **Output**: Binary tensor (N, data_depth, H, W)
+
 - Mỗi pixel chứa `data_depth` bits
 - Threshold > 0 để convert sang binary
 
@@ -404,7 +436,7 @@ class BasicCritic(nn.Module):
         self.conv2 = Conv2d(hidden_size → hidden_size)
         self.conv3 = Conv2d(hidden_size → hidden_size)
         self.conv4 = Conv2d(hidden_size → 1)
-    
+
     def forward(self, image):
         x = conv1(image)
         x = conv2(x)
@@ -414,6 +446,7 @@ class BasicCritic(nn.Module):
 ```
 
 **Critic vs Discriminator**:
+
 - Discriminator: Output probability [0, 1]
 - Critic: Output unbounded score (real number)
 - Critic phù hợp với WGAN-GP
@@ -432,20 +465,21 @@ class ReverseDecoder(nn.Module):
         self.conv3 = Conv2d(hidden_size → hidden_size)
         self.conv4 = Conv2d(hidden_size → hidden_size)
         self.conv5 = Conv2d(hidden_size → 3) + Tanh
-    
+
     def forward(self, stego):
         x = conv1(stego)
         x = conv2(x)
         x = conv3(x)
         x = conv4(x)
         delta = conv5(x)
-        
+
         # Residual: Cover = Stego + Δ_reverse
         cover = stego + delta
         return clamp(cover, -1, 1)
 ```
 
 **Ứng dụng**:
+
 - Khôi phục ảnh gốc sau khi truyền tin
 - Xóa bỏ dấu vết steganography
 - Forensics: Phát hiện đã từng chứa thông tin ẩn
@@ -466,7 +500,7 @@ Steganography cần balance nhiều mục tiêu:
 Để đạt được, CustomGANStego dùng multi-loss training:
 
 ```python
-total_loss = w1*L_mse + w2*L_ssim + w3*L_perceptual + 
+total_loss = w1*L_mse + w2*L_ssim + w3*L_perceptual +
              w4*L_decoder + w5*L_adversarial + w6*L_reverse
 ```
 
@@ -481,11 +515,13 @@ L_mse = MSE(stego, cover)
 
 **Mục đích**: Giữ ảnh stego gần với cover về pixel values
 
-**Ưu điểm**: 
+**Ưu điểm**:
+
 - Đơn giản, dễ optimize
 - Đảm bảo pixel-level similarity
 
 **Nhược điểm**:
+
 - Không capture perceptual quality
 - Có thể tạo blurry images
 
@@ -500,6 +536,7 @@ L_ssim = 1 - SSIM(stego, cover)
 ```
 
 SSIM được tính dựa trên 3 thành phần:
+
 - Luminance: `l(x,y) = (2μ_x μ_y + C1) / (μ_x^2 + μ_y^2 + C1)`
 - Contrast: `c(x,y) = (2σ_x σ_y + C2) / (σ_x^2 + σ_y^2 + C2)`
 - Structure: `s(x,y) = (σ_xy + C3) / (σ_x σ_y + C3)`
@@ -507,6 +544,7 @@ SSIM được tính dựa trên 3 thành phần:
 **Mục đích**: Preserve structural information
 
 **Ưu điểm**:
+
 - Better perceptual metric than MSE
 - Sensitive to structural changes
 
@@ -521,12 +559,14 @@ L_perceptual = MSE(VGG(stego), VGG(cover))
 ```
 
 Sử dụng features từ pretrained VGG16:
+
 - Extract features từ intermediate layers (conv3_3, conv4_3)
 - Compare feature representations thay vì pixels
 
 **Mục đích**: Preserve semantic content
 
 **Ưu điểm**:
+
 - Captures high-level perceptual similarity
 - Less sensitive to small pixel changes
 
@@ -564,6 +604,7 @@ L_adv = -E[Critic(stego)]
 **Mục đích**: Làm stego image khó phân biệt với cover
 
 **Gradient Penalty**:
+
 ```python
 GP = E[(||∇Critic(interpolated)||_2 - 1)^2]
 ```
@@ -577,13 +618,14 @@ GP = E[(||∇Critic(interpolated)||_2 - 1)^2]
 **6. Reverse Loss (Cover Recovery)**
 
 ```python
-L_reverse = MSE(recovered_cover, original_cover) + 
+L_reverse = MSE(recovered_cover, original_cover) +
             (1 - SSIM(recovered_cover, original_cover))
 ```
 
 **Mục đích**: Đảm bảo có thể khôi phục cover từ stego
 
 **Ưu điểm**:
+
 - Reversibility: Có thể undo steganography
 - Security: Xóa dấu vết sau khi dùng
 
@@ -600,13 +642,13 @@ for _ in range(n_critic):
     stego = encoder(cover, message)
     cover_score = critic(cover)
     stego_score = critic(stego.detach())
-    
+
     # Gradient penalty
     gp = compute_gradient_penalty(critic, cover, stego, device)
-    
+
     # Critic loss (WGAN-GP)
     critic_loss = stego_score - cover_score + lambda_gp * gp
-    
+
     # Backward
     critic_optimizer.zero_grad()
     critic_loss.backward()
@@ -626,7 +668,7 @@ stego_score = critic(stego)
 l_adv = -stego_score.mean()
 
 # Combined loss
-total_loss = (weight_mse * l_mse + 
+total_loss = (weight_mse * l_mse +
               weight_ssim * l_ssim +
               weight_decoder * l_decoder +
               weight_adversarial * l_adv +
@@ -639,6 +681,7 @@ optimizer.step()
 ```
 
 **Hyperparameters**:
+
 - `n_critic = 2`: Train critic 2 lần mỗi iteration
 - `lr_critic = 2e-4`: Learning rate cho critic
 - `lr_encoder_decoder = 2e-4`: Learning rate cho encoder/decoder
@@ -646,16 +689,19 @@ optimizer.step()
 - `epochs = 60`: Số epochs training
 
 **Learning Rate Scheduling**:
+
 ```python
 scheduler = CosineAnnealingLR(optimizer, T_max=epochs)
 ```
 
 Cosine annealing giảm dần learning rate theo công thức:
+
 ```
 lr_t = lr_min + (lr_max - lr_min) * (1 + cos(πt/T)) / 2
 ```
 
 **Early Stopping**: Dừng khi đạt targets
+
 - Decoder Accuracy >= 95%
 - PSNR >= 35 dB
 - SSIM >= 0.90
@@ -667,12 +713,15 @@ lr_t = lr_min + (lr_max - lr_min) * (1 + cos(πt/T)) / 2
 ### 6.1 Khái niệm Reversible Steganography
 
 **Traditional steganography**:
+
 ```
 Cover → [Embed] → Stego → [Extract] → Message
 ```
+
 Sau khi extract message, không thể recover lại cover image chính xác.
 
 **Reversible steganography**:
+
 ```
 Cover → [Embed] → Stego → [Extract] → Message
                      ↓
@@ -684,21 +733,25 @@ Có thể khôi phục lại cover image gần như hoàn hảo.
 ### 6.2 Tại sao cần Reversible Steganography?
 
 **1. Security Enhancement**:
+
 - Sau khi truyền tin, xóa bỏ steganography traces
 - Người thứ ba không biết từng có thông tin ẩn
 - Forensics khó phát hiện
 
 **2. Cover Image Recovery**:
+
 - Khôi phục ảnh gốc chất lượng cao
 - Quan trọng với ảnh có giá trị (y tế, pháp lý)
 - Tái sử dụng cover image cho lần sau
 
 **3. Lossless Communication**:
+
 - Không làm mất chất lượng cover image
 - Important cho applications yêu cầu lossless
 - Medical imaging, satellite imagery
 
 **4. Dual-purpose Communication**:
+
 - Channel 1: Secret message (hidden)
 - Channel 2: Cover image (overt)
 - Cả hai đều được bảo toàn
@@ -708,12 +761,14 @@ Có thể khôi phục lại cover image gần như hoàn hảo.
 **Architecture Design**:
 
 Reverse Decoder học ánh xạ ngược:
+
 ```
 Encoder:   Cover + Message → Stego
 Reverse:   Stego → Cover_recovered
 ```
 
 **Training với Reverse Loss**:
+
 ```python
 # Forward pass
 stego = encoder(cover, message)
@@ -729,6 +784,7 @@ total_loss += weight_reverse * reverse_loss
 ```
 
 **Residual Learning Strategy**:
+
 ```python
 class ReverseDecoder(nn.Module):
     def forward(self, stego):
@@ -738,6 +794,7 @@ class ReverseDecoder(nn.Module):
 ```
 
 **Tại sao dùng residual?**:
+
 - Stego ≈ Cover (only small differences)
 - Easier to learn: Delta ≈ 0
 - Better gradient flow
@@ -746,26 +803,31 @@ class ReverseDecoder(nn.Module):
 ### 6.4 Performance Metrics
 
 **Reverse PSNR**: Đo chất lượng khôi phục
+
 ```
 RPSNR = 10 * log10(MAX^2 / MSE(recovered, cover))
 ```
 
 Targets:
+
 - RPSNR > 30 dB: Excellent
 - RPSNR 25-30 dB: Good
 - RPSNR < 25 dB: Cần improve
 
 **Reverse SSIM**: Đo structural similarity
+
 ```
 RSSIM = SSIM(recovered, cover)
 ```
 
 Targets:
+
 - RSSIM > 0.95: Excellent
 - RSSIM 0.90-0.95: Good
 - RSSIM < 0.90: Cần improve
 
 **Trong CustomGANStego**:
+
 - Best model (Epoch 33): RPSNR = 29.78 dB, RSSIM ~ 0.92
 - Có thể recover cover với quality rất cao
 - Imperceptible differences với naked eye
@@ -775,6 +837,7 @@ Targets:
 **Scenario: Secure Communication**
 
 1. **Sender side**:
+
 ```bash
 # Embed secret message
 python runencode.py cover.png "Secret message" --encrypt
@@ -783,6 +846,7 @@ python runencode.py cover.png "Secret message" --encrypt
 ```
 
 2. **Receiver side**:
+
 ```bash
 # Extract message
 python rundecode.py stego.png --encrypt
@@ -795,6 +859,7 @@ python runreverse.py stego.png
 ```
 
 **Benefits**:
+
 - Message extracted: Mission accomplished
 - Cover recovered: No evidence of steganography
 - Plausible deniability: "This is just a normal photo"
@@ -812,12 +877,14 @@ CustomGANStego kết hợp nhiều kỹ thuật tiên tiến:
 5. **Reversible Design**: Khôi phục cover image cho security
 
 **Key innovations**:
+
 - Residual connections cho better learning
 - Dense connections cho feature reuse
 - Reverse decoder cho reversibility
 - Weighted scoring cho model selection
 
 Kiến trúc này đạt được:
+
 - Decoder Accuracy: >98%
 - PSNR: >32 dB
 - SSIM: >0.90

@@ -218,42 +218,72 @@ if [ -d "dist/CustomGANStego.app" ]; then
     echo "   Size: $APP_SIZE"
     echo ""
     
-    # ==================== STEP 3: Create DMG ====================
-    echo "📋 Step 3: Creating DMG Installer"
+    # ==================== STEP 3: Create Distribution Package ====================
+    echo "📋 Step 3: Creating Distribution Package"
     echo "----------------------------------------"
     
-    DMG_NAME="CustomGANStego-macOS.dmg"
-    DMG_PATH="$SCRIPT_DIR/dist/$DMG_NAME"
-    TEMP_DMG="$SCRIPT_DIR/dist/temp.dmg"
-    VOLUME_NAME="CustomGANStego"
+    # Ask user if they want DMG or ZIP
+    echo "Choose distribution format:"
+    echo "  1) ZIP archive (recommended - smaller, faster)"
+    echo "  2) DMG disk image (traditional macOS installer)"
+    echo "  3) Skip packaging (just use .app directly)"
+    read -p "Enter choice [1-3] (default: 1): " PACKAGE_CHOICE
+    PACKAGE_CHOICE=${PACKAGE_CHOICE:-1}
     
-    # Remove old DMG if exists
-    rm -f "$DMG_PATH" "$TEMP_DMG"
-    
-    echo "📦 Creating disk image..."
-    
-    # Create a temporary DMG
-    hdiutil create -size 500m -fs HFS+ -volname "$VOLUME_NAME" "$TEMP_DMG" > /dev/null 2>&1
-    
-    # Mount the DMG
-    MOUNT_DIR=$(hdiutil attach "$TEMP_DMG" | grep "/Volumes/$VOLUME_NAME" | awk '{print $3}')
-    
-    if [ -z "$MOUNT_DIR" ]; then
-        echo "⚠️  Failed to mount temporary DMG"
-        echo "   Skipping DMG creation"
-    else
-        # Copy app to DMG
-        echo "📋 Copying app to DMG..."
-        cp -R "dist/CustomGANStego.app" "$MOUNT_DIR/"
+    if [ "$PACKAGE_CHOICE" = "1" ]; then
+        # Create ZIP
+        ZIP_NAME="CustomGANStego-macOS.zip"
+        ZIP_PATH="$SCRIPT_DIR/dist/$ZIP_NAME"
+        rm -f "$ZIP_PATH"
         
-        # Create Applications symlink
-        ln -s /Applications "$MOUNT_DIR/Applications"
+        echo "📦 Creating ZIP archive..."
+        cd "$SCRIPT_DIR/dist"
+        zip -r -q "$ZIP_NAME" CustomGANStego.app
+        cd "$SCRIPT_DIR"
         
-        # Copy README
-        cp README.md "$MOUNT_DIR/README.txt"
+        if [ -f "$ZIP_PATH" ]; then
+            ZIP_SIZE=$(du -sh "$ZIP_PATH" | awk '{print $1}')
+            echo "✅ ZIP created successfully!"
+            echo "   Location: $ZIP_PATH"
+            echo "   Size: $ZIP_SIZE"
+        else
+            echo "⚠️  ZIP creation failed"
+        fi
         
-        # Create a simple instruction file
-        cat > "$MOUNT_DIR/INSTALL.txt" << 'EOL'
+    elif [ "$PACKAGE_CHOICE" = "2" ]; then
+        # Create DMG
+        DMG_NAME="CustomGANStego-macOS.dmg"
+        DMG_PATH="$SCRIPT_DIR/dist/$DMG_NAME"
+        TEMP_DMG="$SCRIPT_DIR/dist/temp.dmg"
+        VOLUME_NAME="CustomGANStego"
+        
+        # Remove old DMG if exists
+        rm -f "$DMG_PATH" "$TEMP_DMG"
+        
+        echo "📦 Creating disk image (this may take a while)..."
+        
+        # Create a temporary DMG (3GB for large PyTorch app with overhead)
+        hdiutil create -size 3000m -fs HFS+ -volname "$VOLUME_NAME" "$TEMP_DMG" > /dev/null 2>&1
+        
+        # Mount the DMG
+        MOUNT_DIR=$(hdiutil attach "$TEMP_DMG" | grep "/Volumes/$VOLUME_NAME" | awk '{print $3}')
+        
+        if [ -z "$MOUNT_DIR" ]; then
+            echo "⚠️  Failed to mount temporary DMG"
+            echo "   Skipping DMG creation"
+        else
+            # Copy app to DMG
+            echo "📋 Copying app to DMG..."
+            cp -R "dist/CustomGANStego.app" "$MOUNT_DIR/"
+            
+            # Create Applications symlink
+            ln -s /Applications "$MOUNT_DIR/Applications"
+            
+            # Copy README
+            cp README.md "$MOUNT_DIR/README.txt"
+            
+            # Create a simple instruction file
+            cat > "$MOUNT_DIR/INSTALL.txt" << 'EOL'
 CustomGANStego - Installation Instructions
 ==========================================
 
@@ -273,26 +303,27 @@ For more information, see README.txt
 
 Enjoy! 🎉
 EOL
-        
-        # Set background color (optional)
-        # This requires AppleScript but we'll skip for simplicity
-        
-        # Unmount
-        echo "💾 Finalizing DMG..."
-        hdiutil detach "$MOUNT_DIR" > /dev/null 2>&1
-        
-        # Convert to compressed DMG
-        hdiutil convert "$TEMP_DMG" -format UDZO -o "$DMG_PATH" > /dev/null 2>&1
-        rm -f "$TEMP_DMG"
-        
-        if [ -f "$DMG_PATH" ]; then
-            DMG_SIZE=$(du -sh "$DMG_PATH" | awk '{print $1}')
-            echo "✅ DMG created successfully!"
-            echo "   Location: $DMG_PATH"
-            echo "   Size: $DMG_SIZE"
-        else
-            echo "⚠️  DMG creation failed"
+            
+            # Unmount
+            echo "💾 Finalizing DMG..."
+            hdiutil detach "$MOUNT_DIR" > /dev/null 2>&1
+            
+            # Convert to compressed DMG
+            hdiutil convert "$TEMP_DMG" -format UDZO -o "$DMG_PATH" > /dev/null 2>&1
+            rm -f "$TEMP_DMG"
+            
+            if [ -f "$DMG_PATH" ]; then
+                DMG_SIZE=$(du -sh "$DMG_PATH" | awk '{print $1}')
+                echo "✅ DMG created successfully!"
+                echo "   Location: $DMG_PATH"
+                echo "   Size: $DMG_SIZE"
+            else
+                echo "⚠️  DMG creation failed"
+            fi
         fi
+    else
+        echo "⏭️  Skipping package creation"
+        echo "   Use dist/CustomGANStego.app directly"
     fi
     
     echo ""
