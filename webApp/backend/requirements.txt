@@ -1,0 +1,28 @@
+# CustomGANStego Web API Requirements
+
+# Web Framework
+Flask>=2.3.0
+Flask-CORS>=4.0.0
+gunicorn>=21.2.0
+
+# HTTP Client
+requests>=2.31.0
+
+# Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Image Processing
+Pillow>=9.0.0
+imageio>=2.25.0
+numpy>=1.24.0
+scikit-image>=0.20.0
+
+# Encryption
+pycryptodome>=3.17.0
+
+# Error Correction
+reedsolo>=1.7.0
+
+# Utilities
+Werkzeug>=2.3.0

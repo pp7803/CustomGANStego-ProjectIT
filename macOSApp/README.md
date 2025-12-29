@@ -1,8 +1,8 @@
-# 🔐 CustomGANStego macOS Application
+# CustomGANStego macOS Application
 
 Ứng dụng macOS với giao diện đồ họa cho hệ thống giấu tin (steganography) sử dụng Deep Learning với GAN.
 
-## ✨ Features
+## Features
 
 - **📝 Encode** - Giấu tin vào ảnh với GAN
 - **🔍 Decode** - Trích xuất tin từ ảnh stego
@@ -11,7 +11,7 @@
 - **📊 Compare** - Tính PSNR/SSIM/MSE metrics
 - **🔒 Encryption** - RSA+AES hybrid encryption
 
-## 🚀 Quick Start
+## Quick Start
 
 ### One-Command Build
 
@@ -144,7 +144,7 @@ Stego.png → Reverse → Recovered.png
 Compare: Cover vs Recovered (PSNR >45 dB)
 ```
 
-## 📊 Quality Metrics
+## Quality Metrics
 
 | Metric | Good      | Excellent |
 | ------ | --------- | --------- |
@@ -152,7 +152,7 @@ Compare: Cover vs Recovered (PSNR >45 dB)
 | SSIM   | 0.90-0.95 | >0.95     |
 | MSE    | <100      | <50       |
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### App không mở (macOS security)
 
@@ -194,7 +194,7 @@ macOSApp/
 - **Stego image**: An toàn để gửi (tin đã mã hóa)
 - **Backup**: Lưu private key ở nơi an toàn
 
-## 💡 Tips
+## Tips
 
 - Use PNG for best quality
 - PSNR >40 dB = invisible to human eye
@@ -202,7 +202,7 @@ macOSApp/
 - Backup private keys securely
 - Check comparison metrics before sending
 
-## 📝 License
+## License
 
 Project CustomGANStego - CNTT
 
@@ -212,7 +212,7 @@ Project CustomGANStego - CNTT
 
 For more info, see parent project README.
 
-## ✨ Tính năng
+## Tính năng
 
 - **📝 Encode (Giấu tin)**: Nhúng tin nhắn bí mật vào ảnh với GAN
 - **🔍 Decode (Trích xuất)**: Trích xuất tin nhắn từ ảnh stego
@@ -222,7 +222,7 @@ For more info, see parent project README.
 - **🔒 RSA + AES Encryption**: Mã hóa hybrid cho bảo mật cao
 - **🖼️ Visual Comparison**: Hiển thị ảnh comparison với difference maps
 
-## 🖥️ Giao diện
+## Giao diện
 
 App có 5 tabs chính:
 
@@ -232,7 +232,7 @@ App có 5 tabs chính:
 4. **🔑 GenRSA** - Tạo khóa RSA
 5. **📊 Compare** - So sánh và tính metrics
 
-## 🚀 Cài đặt và Build
+## Cài đặt và Build
 
 ### Bước 1: Cài đặt dependencies
 
@@ -292,7 +292,7 @@ pyinstaller>=5.10.0       # Build tool
 
 ## 📖 Hướng dẫn sử dụng chi tiết
 
-### 1. 📝 Encode - Giấu tin vào ảnh
+### 1. Encode - Giấu tin vào ảnh
 
 **Bước 1:** Chọn ảnh Cover
 
@@ -319,7 +319,7 @@ pyinstaller>=5.10.0       # Build tool
 
 ---
 
-### 2. 🔍 Decode - Trích xuất tin
+### 2. Decode - Trích xuất tin
 
 **Bước 1:** Chọn ảnh Stego
 
@@ -343,7 +343,7 @@ pyinstaller>=5.10.0       # Build tool
 
 ---
 
-### 3. ⏮️ Reverse - Khôi phục ảnh gốc
+### 3. Reverse - Khôi phục ảnh gốc
 
 **Bước 1:** Chọn ảnh Stego
 
@@ -367,7 +367,7 @@ pyinstaller>=5.10.0       # Build tool
 
 ---
 
-### 4. 🔑 GenRSA - Tạo cặp khóa RSA
+### 4. GenRSA - Tạo cặp khóa RSA
 
 **Bước 1:** Chọn độ dài khóa
 
@@ -393,7 +393,7 @@ pyinstaller>=5.10.0       # Build tool
 
 ---
 
-### 5. 📊 Compare - So sánh và tính Metrics
+### 5. Compare - So sánh và tính Metrics
 
 **Bước 1:** Chọn 2 ảnh để so sánh
 
@@ -490,7 +490,7 @@ pyinstaller>=5.10.0       # Build tool
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Lỗi: "Model not found"
 
@@ -574,7 +574,7 @@ Alice                          Bob
 
 ---
 
-## 📊 So sánh với các phương pháp khác
+## So sánh với các phương pháp khác
 
 | Phương pháp        | PSNR   | SSIM  | Dung lượng | Tốc độ     | Reverse  |
 | ------------------ | ------ | ----- | ---------- | ---------- | -------- |
@@ -624,7 +624,7 @@ rm -rf build dist __pycache__ *.spec.bak
 
 ---
 
-## 📝 License
+## License
 
 Project CustomGANStego - CNTT
 
@@ -650,7 +650,7 @@ Nếu có vấn đề, vui lòng mở issue trên GitHub. 3. Chọn đường d�
 - **Auto-detect**: Tự động tìm model tốt nhất
 - **Generate RSA Keys**: Tạo cặp khóa RSA mới
 
-## 🔐 Về mã hóa RSA+AES
+## Về mã hóa RSA+AES
 
 Khi bật encryption:
 
@@ -668,7 +668,7 @@ Settings > Generate 2048-bit RSA Keys
 python ../genRSA.py --bits 2048
 ```
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### "Steganography modules not available"
 
@@ -697,6 +697,6 @@ rm -rf build dist
 pyinstaller steganography_app.spec
 ```
 
-## 📝 License
+## License
 
 MIT License - CustomGANStego Team

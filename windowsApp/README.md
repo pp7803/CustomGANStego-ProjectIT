@@ -1,8 +1,8 @@
-# 🔐 CustomGANStego Windows Application
+# CustomGANStego Windows Application
 
 Ứng dụng Windows với giao diện đồ họa cho hệ thống giấu tin (steganography) sử dụng Deep Learning với GAN.
 
-## ✨ Features
+## Features
 
 - **📝 Encode** - Giấu tin vào ảnh với GAN
 - **🔍 Decode** - Trích xuất tin từ ảnh stego
@@ -11,7 +11,7 @@
 - **📊 Compare** - Tính PSNR/SSIM/MSE metrics
 - **🔒 Encryption** - RSA+AES hybrid encryption
 
-## 🚀 Quick Start
+## Quick Start
 
 ### One-Command Build
 
@@ -54,7 +54,7 @@ cd windowsApp
 python steganography_app.py
 ```
 
-## 📋 Requirements
+## Requirements
 
 ### System Requirements
 
@@ -139,7 +139,7 @@ pyinstaller --clean ^
 dist\CustomGANStego.exe
 ```
 
-## 📱 Sử dụng Application
+## Sử dụng Application
 
 ### Interface Overview
 
@@ -222,7 +222,7 @@ App có 5 tabs chính:
 - Xem PSNR/SSIM/MSE
 - Click "💾 Save PNG" để lưu comparison
 
-## 🎨 Customization
+## Customization
 
 ### Theme & Style
 
@@ -308,7 +308,7 @@ Name: "{group}\CustomGANStego"; Filename: "{app}\CustomGANStego.exe"
    signtool sign /f certificate.pfx /p password /t http://timestamp.digicert.com dist\CustomGANStego.exe
    ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### App không khởi động
 
@@ -376,7 +376,7 @@ Name: "{group}\CustomGANStego"; Filename: "{app}\CustomGANStego.exe"
 - Resize ảnh xuống 1024x1024 hoặc nhỏ hơn
 - Tăng RAM máy tính
 
-## 🔧 Advanced
+## Advanced
 
 ### Multi-file Build
 
@@ -450,14 +450,14 @@ Giảm kích thước exe với UPX:
    pyinstaller --upx-dir=C:\path\to\upx ...
    ```
 
-## 📚 Additional Resources
+## Additional Resources
 
 - **PyInstaller Docs**: https://pyinstaller.org/
 - **Windows Dev Center**: https://developer.microsoft.com/windows/
 - **Inno Setup**: https://jrsoftware.org/isinfo.php
 - **NSIS**: https://nsis.sourceforge.io/
 
-## 🆘 Support
+## Support
 
 Nếu gặp vấn đề:
 
@@ -472,11 +472,11 @@ Nếu gặp vấn đề:
    - Error message/screenshot
    - Build log
 
-## 📄 License
+## License
 
 MIT License - Xem file LICENSE trong project root.
 
-## 👥 Credits
+## Credits
 
 - **CustomGANStego Team**
 - Built with PyInstaller, PyTorch, and tkinter
