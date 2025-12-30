@@ -1,7 +1,7 @@
 @echo off
 REM ============================================
-REM Build script for CustomGANStego Windows App
-REM Includes: Environment Check → Build → Usage Guide
+REM Script build cho Ứng Dụng CustomGANStego Windows
+REM Bao gồm: Kiểm Tra Môi Trường → Build → Hướng Dẫn Sử Dụng
 REM ============================================
 
 REM Enable UTF-8 encoding for proper emoji display
@@ -9,7 +9,7 @@ chcp 65001 >nul 2>&1
 
 echo.
 echo ========================================================
-echo    CustomGANStego Windows Application Builder
+echo    Công Cụ Build Ứng Dụng Windows CustomGANStego
 echo ========================================================
 echo.
 
@@ -18,15 +18,15 @@ set "SCRIPT_DIR=%~dp0"
 set "PROJECT_DIR=%SCRIPT_DIR%.."
 set "PRJVENV_DIR=%PROJECT_DIR%\prjvenv"
 
-REM ==================== STEP 1: Environment Check ====================
-echo [Step 1] Checking Environment
+REM ==================== BƯỚC 1: Kiểm Tra Môi Trường ====================
+echo [Bước 1] Kiểm Tra Môi Trường
 echo --------------------------------------------------------
 
 REM Check Python version
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Python not found!
-    echo Please install Python 3.8 or higher from python.org
+    echo [LỖI] Không tìm thấy Python!
+    echo Vui lòng cài đặt Python 3.8 trở lên từ python.org
     pause
     exit /b 1
 )
@@ -36,21 +36,21 @@ echo [OK] Python: %PYTHON_VERSION%
 
 REM Check virtual environment
 if exist "%PRJVENV_DIR%" (
-    echo [OK] Virtual environment found
+    echo [OK] Đã tìm thấy môi trường ảo
     call "%PRJVENV_DIR%\Scripts\activate.bat"
 ) else (
-    echo [WARN] Virtual environment not found at: %PRJVENV_DIR%
+    echo [CẢNH BÁO] Không tìm thấy môi trường ảo tại: %PRJVENV_DIR%
     echo.
-    set /p CREATE_VENV="Create virtual environment now? (y/n): "
+    set /p CREATE_VENV="Tạo môi trường ảo ngay bây giờ? (y/n): "
     if /i "%CREATE_VENV%"=="y" (
-        echo Creating virtual environment...
+        echo Đang tạo môi trường ảo...
         cd /d "%PROJECT_DIR%"
         python -m venv prjvenv
         call prjvenv\Scripts\activate.bat
         cd /d "%SCRIPT_DIR%"
-        echo [OK] Virtual environment created
+        echo [OK] Đã tạo môi trường ảo
     ) else (
-        echo Cannot continue without virtual environment
+        echo Không thể tiếp tục mà không có môi trường ảo
         pause
         exit /b 1
     )
@@ -58,65 +58,65 @@ if exist "%PRJVENV_DIR%" (
 
 echo.
 
-REM ==================== STEP 2: Install Dependencies ====================
-echo [Step 2] Installing Dependencies
+REM ==================== BƯỚC 2: Cài Đặt Dependencies ====================
+echo [Bước 2] Cài Đặt Dependencies
 echo --------------------------------------------------------
 
-echo Upgrading pip...
+echo Đang nâng cấp pip...
 python -m pip install --upgrade pip --quiet
 
-echo Installing requirements...
+echo Đang cài đặt requirements...
 pip install -r requirements.txt --quiet
 
 REM Check critical packages
 python -c "import torch" 2>nul
 if %errorlevel% neq 0 (
-    echo [WARN] PyTorch not installed correctly
-    echo Installing PyTorch...
+    echo [CẢNH BÁO] PyTorch chưa được cài đặt đúng cách
+    echo Đang cài đặt PyTorch...
     pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 )
 
 python -c "import tkinter" 2>nul
 if %errorlevel% neq 0 (
-    echo [WARN] tkinter not available
-    echo Please install tkinter for your Python version
+    echo [CẢNH BÁO] tkinter không khả dụng
+    echo Vui lòng cài đặt tkinter cho phiên bản Python của bạn
 )
 
-echo [OK] All dependencies installed
+echo [OK] Tất cả dependencies đã được cài đặt
 echo.
 
-REM ==================== STEP 3: Check Model Files ====================
-echo [Step 3] Checking Model Files
+REM ==================== BƯỚC 3: Kiểm Tra File Model ====================
+echo [Bước 3] Kiểm Tra File Model
 echo --------------------------------------------------------
 
 if exist "%PROJECT_DIR%\results\model\" (
     dir /b "%PROJECT_DIR%\results\model\*.dat" >nul 2>&1
     if %errorlevel% equ 0 (
-        echo [OK] Model files found in results/model/
+        echo [OK] Đã tìm thấy file model trong results/model/
     ) else (
-        echo [WARN] No model files found
-        echo Please train a model first: python train.py
+        echo [CẢNH BÁO] Không tìm thấy file model
+        echo Vui lòng huấn luyện model trước: python train.py
     )
 ) else (
-    echo [WARN] results/model/ directory not found
-    echo Please train a model first: python train.py
+    echo [CẢNH BÁO] Không tìm thấy thư mục results/model/
+    echo Vui lòng huấn luyện model trước: python train.py
 )
 
 echo.
 
-REM ==================== STEP 4: Build Application ====================
-echo [Step 4] Building Windows Application
+REM ==================== BƯỚC 4: Build Ứng Dụng ====================
+echo [Bước 4] Build Ứng Dụng Windows
 echo --------------------------------------------------------
 
 if exist "dist" (
-    echo Cleaning old build...
+    echo Đang dọn dẹp bản build cũ...
     rmdir /s /q dist 2>nul
 )
 if exist "build" (
     rmdir /s /q build 2>nul
 )
 
-echo Running PyInstaller...
+echo Đang chạy PyInstaller...
 python -m PyInstaller --clean ^
     --name=CustomGANStego ^
     --windowed ^
@@ -146,61 +146,61 @@ python -m PyInstaller --clean ^
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Build failed!
+    echo [LỖI] Build thất bại!
     echo.
     pause
     exit /b 1
 )
 
-echo [OK] Build completed successfully
+echo [OK] Hoàn tất build thành công
 echo.
 
-REM ==================== STEP 5: Create Installer (Optional) ====================
-echo [Step 5] Package Application
+REM ==================== BƯỚC 5: Tạo Gói Ứng Dụng (Tùy chọn) ====================
+echo [Bước 5] Đóng Gói Ứng Dụng
 echo --------------------------------------------------------
 
 if exist "dist\CustomGANStego.exe" (
-    echo [OK] Executable created: dist\CustomGANStego.exe
+    echo [OK] Đã tạo file thực thi: dist\CustomGANStego.exe
     
     REM Get file size
     for %%A in ("dist\CustomGANStego.exe") do set SIZE=%%~zA
     set /a SIZE_MB=%SIZE% / 1048576
-    echo      Size: ~%SIZE_MB% MB
+    echo      Kích thước: ~%SIZE_MB% MB
 ) else (
-    echo [ERROR] Executable not found!
+    echo [LỖI] Không tìm thấy file thực thi!
     pause
     exit /b 1
 )
 
 echo.
 
-REM ==================== STEP 6: Usage Guide ====================
-echo [Step 6] Usage Guide
+REM ==================== BƯỚC 6: Hướng Dẫn Sử Dụng ====================
+echo [Bước 6] Hướng Dẫn Sử Dụng
 echo ========================================================
 echo.
-echo BUILD SUCCESSFUL!
+echo BUILD THÀNH CÔNG!
 echo.
-echo Output Location:
+echo Vị Trí Đầu Ra:
 echo   dist\CustomGANStego.exe
 echo.
-echo To Run:
+echo Để Chạy:
 echo   1. Double-click: dist\CustomGANStego.exe
-echo   2. Or from command: .\dist\CustomGANStego.exe
+echo   2. Hoặc từ lệnh: .\dist\CustomGANStego.exe
 echo.
-echo Distribution:
-echo   - Copy dist\CustomGANStego.exe to any Windows PC
-echo   - No Python installation required on target PC
-echo   - Model files are bundled inside the executable
+echo Phân Phối:
+echo   - Sao chép dist\CustomGANStego.exe vào bất kỳ PC Windows nào
+echo   - Không cần cài đặt Python trên PC đích
+echo   - File model đã được tích hợp trong file thực thi
 echo.
-echo Note:
-echo   - First run may take 10-15 seconds to extract
-echo   - Antivirus may flag the exe (false positive)
-echo   - Add exception if needed
+echo Lưu Ý:
+echo   - Lần chạy đầu có thể mất 10-15 giây để giải nén
+echo   - Antivirus có thể chặn exe (false positive)
+echo   - Thêm ngoại lệ nếu cần
 echo.
-echo Troubleshooting:
-echo   - If app doesn't start, run from command prompt to see errors
-echo   - Check Windows Defender / Antivirus logs
-echo   - Ensure model files exist in results\model\
+echo Khắc Phục Sự Cố:
+echo   - Nếu app không khởi động, chạy từ command prompt để xem lỗi
+echo   - Kiểm tra Windows Defender / log Antivirus
+echo   - Đảm bảo file model tồn tại trong results\model\
 echo.
 
 pause

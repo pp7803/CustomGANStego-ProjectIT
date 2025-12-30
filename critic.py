@@ -4,8 +4,8 @@ from torch import nn
 
 class BasicCritic(nn.Module):
     """
-    The BasicCritic module takes an image and predicts whether it is a cover
-    image or a steganographic image (N, 1).
+    Module BasicCritic nhận một ảnh và dự đoán xem đó là ảnh cover
+    hay ảnh steganographic (N, 1).
 
     Input: (N, 3, H, W)
     Output: (N, 1)

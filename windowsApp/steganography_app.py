@@ -109,7 +109,7 @@ except ImportError:
 class SteganographyApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("🔐 GAN Steganography - CustomGANStego")
+        self.root.title("GAN Steganography - CustomGANStego")
         self.root.geometry("1200x800")
         
         # Style configuration for Windows
@@ -127,9 +127,9 @@ class SteganographyApp:
         self.model_path = find_best_model()
         if self.model_path:
             model_name = os.path.basename(self.model_path)
-            print(f"✅ Loaded model: {model_name}")
+            print(f"Loaded model: {model_name}")
         else:
-            print("⚠️  No model found - operations may not work")
+            print("No model found - operations may not work")
         
         # Variables
         self.cover_image_path = None
@@ -161,12 +161,12 @@ class SteganographyApp:
         self.compare_tab = ttk.Frame(notebook)
         self.debug_tab = ttk.Frame(notebook)
         
-        notebook.add(self.encode_tab, text="📝 Encode")
-        notebook.add(self.decode_tab, text="🔍 Decode")
-        notebook.add(self.reverse_tab, text="⏮️  Reverse")
-        notebook.add(self.genrsa_tab, text="🔑 GenRSA")
-        notebook.add(self.compare_tab, text="📊 Compare")
-        notebook.add(self.debug_tab, text="🐛 Debug")
+        notebook.add(self.encode_tab, text="Encode")
+        notebook.add(self.decode_tab, text="Decode")
+        notebook.add(self.reverse_tab, text="Reverse")
+        notebook.add(self.genrsa_tab, text="GenRSA")
+        notebook.add(self.compare_tab, text="Compare")
+        notebook.add(self.debug_tab, text="Debug")
         
         # Setup each tab
         self.setup_encode_tab()
@@ -244,9 +244,9 @@ class SteganographyApp:
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill='x', pady=10)
         
-        ttk.Button(btn_frame, text="🚀 Encode", 
+        ttk.Button(btn_frame, text="Encode", 
                   command=self.run_encode).pack(side='right', padx=5)
-        ttk.Button(btn_frame, text="🧹 Clear", 
+        ttk.Button(btn_frame, text="Clear", 
                   command=self.clear_encode).pack(side='right', padx=5)
         
         # Status
@@ -319,9 +319,9 @@ class SteganographyApp:
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill='x', pady=10)
         
-        ttk.Button(btn_frame, text="🔍 Decode", 
+        ttk.Button(btn_frame, text="Decode", 
                   command=self.run_decode).pack(side='right', padx=5)
-        ttk.Button(btn_frame, text="💾 Save", 
+        ttk.Button(btn_frame, text="Save", 
                   command=self.save_decoded).pack(side='right', padx=5)
         
         # Status
@@ -390,9 +390,9 @@ class SteganographyApp:
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill='x', pady=10)
         
-        ttk.Button(btn_frame, text="⏮️  Reverse", 
+        ttk.Button(btn_frame, text="Reverse", 
                   command=self.run_reverse).pack(side='right', padx=5)
-        ttk.Button(btn_frame, text="💾 Save", 
+        ttk.Button(btn_frame, text="Save", 
                   command=self.save_reversed).pack(side='right', padx=5)
         
         # Status
@@ -450,7 +450,7 @@ class SteganographyApp:
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill='x', pady=10)
         
-        ttk.Button(btn_frame, text="🔑 Tạo khóa", 
+        ttk.Button(btn_frame, text="Tạo khóa", 
                   command=self.run_genrsa).pack(side='right', padx=5)
         
         # Status/Output
@@ -529,9 +529,9 @@ class SteganographyApp:
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill='x', pady=10)
         
-        ttk.Button(btn_frame, text="📊 Tính Metrics", 
+        ttk.Button(btn_frame, text="Tính Metrics", 
                   command=self.run_compare).pack(side='right', padx=5)
-        ttk.Button(btn_frame, text="💾 Save PNG", 
+        ttk.Button(btn_frame, text="Save PNG", 
                   command=self.save_comparison).pack(side='right', padx=5)
         
         self.compare_img1_path = None
@@ -900,11 +900,11 @@ class SteganographyApp:
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(fill='x', pady=5)
         
-        ttk.Button(btn_frame, text="🔄 Refresh", 
+        ttk.Button(btn_frame, text="Refresh", 
                   command=self.refresh_debug_log).pack(side='left', padx=5)
-        ttk.Button(btn_frame, text="🧹 Clear", 
+        ttk.Button(btn_frame, text="Clear", 
                   command=self.clear_debug_log).pack(side='left', padx=5)
-        ttk.Button(btn_frame, text="💾 Save Log", 
+        ttk.Button(btn_frame, text="Save Log", 
                   command=self.save_debug_log).pack(side='left', padx=5)
         
         # Auto-refresh checkbox

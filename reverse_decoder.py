@@ -4,16 +4,16 @@ from torch import nn
 
 class ReverseDecoder(nn.Module):
     """
-    The ReverseDecoder module takes a steganographic image and attempts to 
-    reconstruct the original cover image (Reverse Hiding).
+    Module ReverseDecoder nhận ảnh stego và cố gắng
+    tái tạo lại ảnh cover gốc (Reverse Hiding).
     
-    This enables:
-    - Lossless recovery of original image
-    - Reversible steganography
-    - Higher security (can remove traces)
+    Điều này cho phép:
+    - Khôi phục ảnh gốc không mất mát
+    - Steganography có thể đảo ngược
+    - Bảo mật cao hơn (có thể xóa dấu vết)
     
-    Input: (N, 3, H, W) - Stego image
-    Output: (N, 3, H, W) - Recovered cover image
+    Đầu vào: (N, 3, H, W) - Ảnh stego
+    Đầu ra: (N, 3, H, W) - Ảnh cover đã khôi phục
     """
 
     def _conv2d(self, in_channels, out_channels):
@@ -26,8 +26,8 @@ class ReverseDecoder(nn.Module):
 
     def _build_models(self):
         """
-        Architecture similar to BasicDecoder but output is RGB image (3 channels)
-        Uses residual connections for better gradient flow
+        Kiến trúc tương tự như BasicDecoder nhưng đầu ra là ảnh RGB (3 kênh)
+        Sử dụng kết nối residual để cải thiện luồng gradient
         """
         self.conv1 = nn.Sequential(
             self._conv2d(3, self.hidden_size),
@@ -50,8 +50,8 @@ class ReverseDecoder(nn.Module):
             nn.BatchNorm2d(self.hidden_size),
         )
         self.conv5 = nn.Sequential(
-            self._conv2d(self.hidden_size, 3),  # Output RGB
-            nn.Tanh()  # Output range [-1, 1] to match normalized images
+            self._conv2d(self.hidden_size, 3),
+            nn.Tanh()
         )
 
         return self.conv1, self.conv2, self.conv3, self.conv4, self.conv5
@@ -63,13 +63,13 @@ class ReverseDecoder(nn.Module):
 
     def forward(self, stego_image):
         """
-        Forward pass with residual connection
+        Forward pass với kết nối residual
         
         Args:
-            stego_image: Steganographic image (N, 3, H, W)
+            stego_image: Ảnh stego (N, 3, H, W)
             
         Returns:
-            recovered_cover: Reconstructed cover image (N, 3, H, W)
+            recovered_cover: Ảnh cover đã tái tạo (N, 3, H, W)
         """
         x = self._models[0](stego_image)
         x_1 = self._models[1](x)
@@ -77,11 +77,8 @@ class ReverseDecoder(nn.Module):
         x_3 = self._models[3](x_2)
         x_4 = self._models[4](x_3)
         
-        # Residual connection: stego + delta = cover
-        # This helps network learn only the difference
         recovered_cover = stego_image + x_4
         
-        # Clamp to valid range [-1, 1]
         recovered_cover = torch.clamp(recovered_cover, -1.0, 1.0)
         
         return recovered_cover

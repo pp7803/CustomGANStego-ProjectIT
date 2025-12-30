@@ -1,11 +1,10 @@
 import torch
 from torch import nn
 
-
 class BasicDecoder(nn.Module):
     """
-    The BasicDecoder module takes an steganographic image and attempts to decode
-    the embedded data tensor.
+    Module BasicDecoder nhận một ảnh steganographic và cố gắng giải mã
+    dữ liệu tensor được nhúng.
 
     Input: (N, 3, H, W)
     Output: (N, D, H, W)

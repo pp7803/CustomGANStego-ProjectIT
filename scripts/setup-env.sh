@@ -1,70 +1,70 @@
 #!/bin/bash
 
-# Setup script for CustomGANStego Project
-# This script creates a virtual environment and installs all dependencies
+# Script thiết lập cho Dự Án CustomGANStego
+# Script này tạo môi trường ảo và cài đặt tất cả dependencies
 
-set -e  # Exit on error
+set -e  # Thoát khi có lỗi
 
-echo "=== CustomGANStego Environment Setup ==="
+echo "=== Thiết Lập Môi Trường CustomGANStego ==="
 echo ""
 
-# Check if Python 3 is installed
+# Kiểm tra Python 3 đã được cài đặt chưa
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Error: Python 3 is not installed. Please install Python 3.8 or higher."
+    echo "Lỗi: Python 3 chưa được cài đặt. Vui lòng cài đặt Python 3.8 trở lên."
     exit 1
 fi
 
-# Display Python version
+# Hiển thị phiên bản Python
 PYTHON_VERSION=$(python3 --version)
-echo "✓ Found $PYTHON_VERSION"
+echo "Tìm thấy $PYTHON_VERSION"
 echo ""
 
-# Create virtual environment
+# Tạo môi trường ảo
 if [ -d "prjvenv" ]; then
-    echo "⚠️  Virtual environment 'prjvenv' already exists."
-    read -p "Do you want to recreate it? (y/N): " -n 1 -r
+    echo "Môi trường ảo 'prjvenv' đã tồn tại."
+    read -p "Bạn có muốn tạo lại không? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Removing existing virtual environment..."
+        echo "Đang xóa môi trường ảo hiện tại..."
         rm -rf prjvenv
     else
-        echo "Using existing virtual environment."
+        echo "Sử dụng môi trường ảo hiện tại."
     fi
 fi
 
 if [ ! -d "prjvenv" ]; then
-    echo "Creating virtual environment 'prjvenv'..."
+    echo "Đang tạo môi trường ảo 'prjvenv'..."
     python3 -m venv prjvenv
-    echo "✓ Virtual environment created"
+    echo "Đã tạo môi trường ảo"
     echo ""
 fi
 
-# Activate virtual environment
-echo "Activating virtual environment..."
+# Kích hoạt môi trường ảo
+echo "Đang kích hoạt môi trường ảo..."
 source prjvenv/bin/activate
 
-# Upgrade pip
-echo "Upgrading pip..."
+# Nâng cấp pip
+echo "Đang nâng cấp pip..."
 pip install --upgrade pip
 echo ""
 
-# Install requirements
+# Cài đặt requirements
 if [ -f "requirements.txt" ]; then
-    echo "Installing dependencies from requirements.txt..."
+    echo "Đang cài đặt dependencies từ requirements.txt..."
     pip install -r requirements.txt
     echo ""
-    echo "✓ All dependencies installed successfully"
+    echo "Đã cài đặt tất cả dependencies thành công"
 else
-    echo "❌ Error: requirements.txt not found"
+    echo "Lỗi: Không tìm thấy requirements.txt"
     exit 1
 fi
 
 echo ""
-echo "=== Setup Complete! ==="
+echo "=== Thiết Lập Hoàn Tất! ==="
 echo ""
-echo "To activate the virtual environment, run:"
+echo "Để kích hoạt môi trường ảo, chạy:"
 echo "  source prjvenv/bin/activate"
 echo ""
-echo "To deactivate when you're done, run:"
+echo "Để tắt khi hoàn thành, chạy:"
 echo "  deactivate"
 echo ""

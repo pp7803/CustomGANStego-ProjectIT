@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Training Plots Summary Visualizer
+Công Cụ Hiển Thị Tổng Hợp Biểu Đồ Huấn Luyện
 ==================================
 
-Đọc và tổng hợp tất cả training plots từ thư mục results/plots/
-để tạo comprehensive visualization của quá trình training.
+Đọc và tổng hợp tất cả các biểu đồ huấn luyện từ thư mục results/plots/
+để tạo phân tích trực quan toàn diện của quá trình huấn luyện.
 
-Features:
-- Tự động parse filenames để extract metrics
-- Group metrics theo epoch
-- Plot tất cả metrics trong 1 figure với subplots
-- Bao gồm reverse hiding metrics (reverse_psnr, reverse_ssim)
-- Save summary visualization
-- Print training statistics
+Tính năng:
+- Tự động phân tích tên file để trích xuất chỉ số
+- Nhóm chỉ số theo epoch
+- Vẽ tất cả chỉ số trong 1 hình với các biểu đồ con
+- Bao gồm các chỉ số reverse hiding (reverse_psnr, reverse_ssim)
+- Lưu phân tích tổng hợp
+- In thống kê huấn luyện
 
-File Format Expected:
-    {metric_name}_{epoch}_{value}_{timestamp}.png
+Định dạng file mong đợi:
+    {tên_chỉ_số}_{epoch}_{giá_trị}_{thời_gian}.png
     
-Example filenames:
+Ví dụ tên file:
     - decoder_acc_0_0.7163_2025-12-11_06:18:25.png
     - psnr_0_22.4346_2025-12-11_06:18:25.png
     - reverse_psnr_0_23.3474_2025-12-11_06:18:26.png
@@ -35,47 +35,32 @@ import matplotlib.gridspec as gridspec
 
 def parse_filename(filename):
     """
-    Parse plot filename to extract metric info.
+    Phân tích tên file biểu đồ để trích xuất thông tin chỉ số.
     
-    Format: {metric}_{epoch}_{value}_{timestamp}.png
-    Example: decoder_acc_0_0.7163_2025-12-11_06:18:25.png
+    Định dạng: {chỉ_số}_{epoch}_{giá_trị}_{thời_gian}.png
+    Ví dụ: decoder_acc_0_0.7163_2025-12-11_06:18:25.png
     
-    Returns:
-        dict with keys: metric, epoch, value, timestamp
-        or None if parsing fails
+    Trả về:
+        dict với các khóa: metric, epoch, value, timestamp
+        hoặc None nếu phân tích thất bại
     """
-    # Remove .png extension
     name = filename.replace('.png', '')
     
-    # Split by underscore
     parts = name.split('_')
     
-    if len(parts) < 5:  # metric_epoch_value_date_time (min 5 parts)
+    if len(parts) < 5:
         return None
     
     try:
-        # The pattern is: {metric}_{epoch}_{value}_{YYYY-MM-DD}_{HH:MM:SS}
-        # Example: bpp_0_0.8651_2025-12-11_06:18:25
-        # Example: decoder_acc_0_0.7163_2025-12-11_06:18:25
-        # Example: reverse_psnr_0_23.3474_2025-12-11_06:18:26
-        
-        # Strategy: Work backwards from the end
-        # Last 2 parts are always date and time
-        # Before that is the value (float)
-        # Before that is the epoch (int)
-        # Everything before that is the metric name
-        
         if len(parts) < 5:
             return None
         
-        # Extract from the end
         time_part = parts[-1]  # HH:MM:SS
         date_part = parts[-2]  # YYYY-MM-DD
         value_part = parts[-3]  # float value
         epoch_part = parts[-4]  # epoch number
         metric_parts = parts[:-4]  # metric name (may have underscores)
         
-        # Parse values
         epoch = int(epoch_part)
         value = float(value_part)
         metric = '_'.join(metric_parts)
@@ -94,29 +79,27 @@ def parse_filename(filename):
 
 def collect_metrics(plots_dir):
     """
-    Collect all metrics from plot files.
+    Thu thập tất cả các chỉ số từ các file biểu đồ.
     
-    Returns:
-        dict: {metric_name: [(epoch, value), ...]}
+    Trả về:
+        dict: {tên_chỉ_số: [(epoch, giá_trị), ...]}
     """
     plots_path = Path(plots_dir)
     
     if not plots_path.exists():
-        print(f"❌ Error: Directory not found: {plots_dir}")
+        print(f"Lỗi: Không tìm thấy thư mục: {plots_dir}")
         return {}
     
     metrics_data = defaultdict(list)
     
-    # Get all PNG files
     png_files = list(plots_path.glob('*.png'))
     
     if not png_files:
-        print(f"❌ Error: No PNG files found in {plots_dir}")
+        print(f"Lỗi: Không tìm thấy file PNG nào trong {plots_dir}")
         return {}
     
-    print(f"📊 Found {len(png_files)} plot files")
+    print(f"Đã tìm thấy {len(png_files)} file biểu đồ")
     
-    # Parse each file
     parsed_count = 0
     failed_files = []
     for png_file in png_files:
@@ -127,11 +110,10 @@ def collect_metrics(plots_dir):
         else:
             failed_files.append(png_file.name)
     
-    print(f"✅ Successfully parsed {parsed_count} files")
+    print(f"Đã phân tích thành công {parsed_count} file")
     if failed_files:
-        print(f"⚠️  Failed to parse {len(failed_files)} files")
+        print(f"Không phân tích được {len(failed_files)} file")
     
-    # Sort by epoch
     for metric in metrics_data:
         metrics_data[metric].sort(key=lambda x: x[0])
     
@@ -140,13 +122,12 @@ def collect_metrics(plots_dir):
 
 def plot_summary(metrics_data, output_file='summary_plots/training_summary.png'):
     """
-    Create comprehensive summary plot with all metrics.
+    Tạo biểu đồ tổng hợp toàn diện với tất cả các chỉ số.
     """
     if not metrics_data:
-        print("❌ No data to plot")
+        print("Không có dữ liệu để vẽ")
         return
     
-    # Define metric groups and their properties
     metric_config = {
         'decoder_acc': {
             'ylabel': 'Decoder Accuracy',
@@ -198,7 +179,6 @@ def plot_summary(metrics_data, output_file='summary_plots/training_summary.png')
         }
     }
     
-    # Filter metrics that we have data for and order them
     priority_order = [
         'decoder_acc', 'psnr', 'ssim', 
         'reverse_psnr', 'reverse_ssim',
@@ -206,7 +186,6 @@ def plot_summary(metrics_data, output_file='summary_plots/training_summary.png')
     ]
     available_metrics = [m for m in priority_order if m in metrics_data]
     
-    # Add any other metrics not in priority list
     for m in metrics_data.keys():
         if m not in available_metrics:
             available_metrics.append(m)
@@ -218,10 +197,9 @@ def plot_summary(metrics_data, output_file='summary_plots/training_summary.png')
             }
     
     if not available_metrics:
-        print("❌ No recognized metrics found")
+        print("Không tìm thấy chỉ số nào")
         return
     
-    # Create figure with subplots (4 columns for better layout)
     n_metrics = len(available_metrics)
     n_cols = 4
     n_rows = (n_metrics + n_cols - 1) // n_cols
@@ -230,7 +208,7 @@ def plot_summary(metrics_data, output_file='summary_plots/training_summary.png')
     gs = gridspec.GridSpec(n_rows, n_cols, figure=fig, hspace=0.3, wspace=0.25)
     
     print(f"\n{'='*80}")
-    print(f"📈 Training Metrics Summary")
+    print(f"Tổng Hợp Các Chỉ Số Huấn Luyện")
     print(f"{'='*80}\n")
     
     for idx, metric in enumerate(available_metrics):
@@ -246,7 +224,6 @@ def plot_summary(metrics_data, output_file='summary_plots/training_summary.png')
             'ylim': None
         })
         
-        # Plot with markers
         ax.plot(epochs, values, 
                 marker='o', 
                 markersize=3,
@@ -255,62 +232,58 @@ def plot_summary(metrics_data, output_file='summary_plots/training_summary.png')
                 label=metric,
                 alpha=0.8)
         
-        # Add grid
         ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
         
-        # Labels and title
         ax.set_xlabel('Epoch', fontsize=10, fontweight='bold')
         ax.set_ylabel(config['ylabel'], fontsize=10, fontweight='bold')
         ax.set_title(f"{config['ylabel']}", fontsize=11, fontweight='bold', pad=10)
         
-        # Set y-axis limits if specified
         if config['ylim']:
             ax.set_ylim(config['ylim'])
         
-        # Highlight best value
         if config['better'] == 'higher':
             best_idx = values.index(max(values))
             best_epoch = epochs[best_idx]
             best_val = values[best_idx]
             ax.plot(best_epoch, best_val, 'r*', markersize=12, 
-                   label=f'Best: {best_val:.4f}', zorder=5)
+                   label=f'Tốt nhất: {best_val:.4f}', zorder=5)
         elif config['better'] == 'lower':
             best_idx = values.index(min(values))
             best_epoch = epochs[best_idx]
             best_val = values[best_idx]
             ax.plot(best_epoch, best_val, 'r*', markersize=12,
-                   label=f'Best: {best_val:.4f}', zorder=5)
+                   label=f'Tốt nhất: {best_val:.4f}', zorder=5)
         
         ax.legend(loc='best', fontsize=8, framealpha=0.9)
         
-        # Print statistics
-        min_val = min(values)
-        max_val = max(values)
-        final_val = values[-1]
+        # Tính toán các giá trị thống kê
         initial_val = values[0]
+        final_val = values[-1]
+        max_val = max(values)
+        min_val = min(values)
         mean_val = sum(values) / len(values)
         
         print(f"{config['ylabel']:30s}")
-        print(f"  Initial (epoch {epochs[0]:3d}):  {initial_val:12.6f}")
-        print(f"  Final   (epoch {epochs[-1]:3d}):  {final_val:12.6f}")
+        print(f"  Ban đầu (epoch {epochs[0]:3d}):  {initial_val:12.6f}")
+        print(f"  Cuối    (epoch {epochs[-1]:3d}):  {final_val:12.6f}")
         
         if config['better'] == 'higher':
             best_val = max_val
             best_epoch = epochs[values.index(best_val)]
             improvement = ((final_val - initial_val) / initial_val * 100) if initial_val != 0 else 0
-            print(f"  Best    (epoch {best_epoch:3d}):  {best_val:12.6f} ⭐")
-            print(f"  Mean:                    {mean_val:12.6f}")
-            print(f"  Improvement:             {improvement:+.2f}%")
+            print(f"  Tốt nhất (epoch {best_epoch:3d}):  {best_val:12.6f}")
+            print(f"  Trung bình:                {mean_val:12.6f}")
+            print(f"  Cải thiện:                {improvement:+.2f}%")
         elif config['better'] == 'lower':
             best_val = min_val
             best_epoch = epochs[values.index(best_val)]
             reduction = ((initial_val - final_val) / initial_val * 100) if initial_val != 0 else 0
-            print(f"  Best    (epoch {best_epoch:3d}):  {best_val:12.6f} ⭐")
-            print(f"  Mean:                    {mean_val:12.6f}")
-            print(f"  Reduction:               {reduction:+.2f}%")
+            print(f"  Tốt nhất (epoch {best_epoch:3d}):  {best_val:12.6f}")
+            print(f"  Trung bình:                {mean_val:12.6f}")
+            print(f"  Giảm:                      {reduction:+.2f}%")
         else:
-            print(f"  Mean:                    {mean_val:12.6f}")
-            print(f"  Range:                   [{min_val:.6f}, {max_val:.6f}]")
+            print(f"  Trung bình:                {mean_val:12.6f}")
+            print(f"  Khoảng:                    [{min_val:.6f}, {max_val:.6f}]")
         print()
     
     # Overall title
@@ -320,27 +293,24 @@ def plot_summary(metrics_data, output_file='summary_plots/training_summary.png')
             all_epochs_list.append(epoch)
     total_epochs = max(all_epochs_list) if all_epochs_list else 0
     
-    fig.suptitle(f'Training Progress Summary - All Metrics (Total: {total_epochs + 1} epochs)', 
+    fig.suptitle(f'Tổng Hợp Tiến Trình Huấn Luyện - Tất Cả Chỉ Số (Tổng: {total_epochs + 1} epochs)', 
                  fontsize=16, 
                  fontweight='bold',
                  y=0.998)
     
-    # Save figure
     plt.savefig(output_file, dpi=150, bbox_inches='tight', facecolor='white')
     print(f"{'='*80}")
-    print(f"✅ Summary plot saved to: {output_file}")
+    print(f"Biểu đồ tổng hợp đã lưu vào: {output_file}")
     print(f"{'='*80}\n")
     
-    # Show plot
     plt.show()
 
 
 def print_epoch_summary(metrics_data):
-    """Print summary of available epochs and metrics per epoch."""
+    """In tổng hợp các epoch khả dụng và chỉ số theo epoch."""
     if not metrics_data:
         return
     
-    # Get all epochs across all metrics
     all_epochs = set()
     for metric_values in metrics_data.values():
         all_epochs.update(epoch for epoch, _ in metric_values)
@@ -348,24 +318,24 @@ def print_epoch_summary(metrics_data):
     all_epochs = sorted(all_epochs)
     
     print(f"\n{'='*80}")
-    print(f"📊 Dataset Summary")
+    print(f"Tổng Hợp Dữ Liệu")
     print(f"{'='*80}\n")
-    print(f"Total Metrics: {len(metrics_data)}")
-    print(f"Total Epochs:  {len(all_epochs)}")
-    print(f"Epoch Range:   {min(all_epochs)} → {max(all_epochs)}\n")
+    print(f"Tổng số chỉ số: {len(metrics_data)}")
+    print(f"Tổng số epoch:  {len(all_epochs)}")
+    print(f"Khoảng epoch:   {min(all_epochs)} → {max(all_epochs)}\n")
     
-    print(f"Available Metrics:")
+    print(f"Các chỉ số khả dụng:")
     for metric, values in sorted(metrics_data.items()):
-        print(f"  • {metric:20s} : {len(values):3d} data points")
+        print(f"  • {metric:20s} : {len(values):3d} điểm dữ liệu")
     print()
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Visualize training progress from plots directory",
+        description="Hiển thị tiến trình huấn luyện từ thư mục biểu đồ",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
+Ví dụ:
   python plotsummary.py
   python plotsummary.py --plots-dir results/plots --output summary.png
         """
@@ -374,34 +344,31 @@ Examples:
         '--plots-dir',
         type=str,
         default='results/plots',
-        help='Directory containing training plots (default: results/plots)'
+        help='Thư mục chứa các biểu đồ huấn luyện (mặc định: results/plots)'
     )
     parser.add_argument(
         '--output',
         type=str,
         default='summary_plots/training_summary.png',
-        help='Output filename for summary plot (default: training_summary.png)'
+        help='Tên file đầu ra cho biểu đồ tổng hợp (mặc định: training_summary.png)'
     )
     
     args = parser.parse_args()
     
     print("\n" + "="*80)
-    print("🔍 Training Plots Summary Tool")
+    print("Công Cụ Tổng Hợp Biểu Đồ Huấn Luyện")
     print("="*80 + "\n")
-    print(f"📂 Reading from: {args.plots_dir}")
-    print(f"💾 Output file:  {args.output}\n")
+    print(f"Đang đọc từ: {args.plots_dir}")
+    print(f"File đầu ra:  {args.output}\n")
     
-    # Collect metrics
     metrics_data = collect_metrics(args.plots_dir)
     
     if not metrics_data:
-        print("\n❌ No metrics data collected. Check your plots directory.")
+        print("\nKhông thu thập được dữ liệu chỉ số. Kiểm tra thư mục biểu đồ của bạn.")
         return
     
-    # Print summary
     print_epoch_summary(metrics_data)
     
-    # Plot summary
     plot_summary(metrics_data, args.output)
 
 

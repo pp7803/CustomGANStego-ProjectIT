@@ -2,11 +2,10 @@ import torch
 from torch import nn
 import numpy
 
-
 class BasicEncoder(nn.Module):
     """
-    The BasicEncoder module takes an cover image and a data tensor and combines
-    them into a steganographic image.
+    Module BasicEncoder nhận một ảnh cover và một tensor dữ liệu và kết hợp
+    chúng thành một ảnh steganographic.
 
     """
 

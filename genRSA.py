@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-GENRSA - Simple RSA keypair generator
+GENRSA - Công cụ tạo cặp khóa RSA đơn giản
 =====================================
 
-Utility script to create RSA public/private key pairs for the
-steganography pipeline. The encode/decode scripts consume these PEM
-files directly.
+Script tiện ích để tạo cặp khóa public/private RSA cho
+quá trình steganography. Các script encode/decode sử dụng
+trực tiếp các file PEM này.
 """
 
 import argparse
@@ -15,7 +13,7 @@ from Crypto.PublicKey import RSA
 
 
 def generate_keypair(bits: int) -> tuple[bytes, bytes]:
-    """Generate an RSA keypair and return (public_pem, private_pem)."""
+    """Tạo cặp khóa RSA và trả về (public_pem, private_pem)."""
     key = RSA.generate(bits)
     private_key = key.export_key()
     public_key = key.publickey().export_key()
@@ -23,7 +21,7 @@ def generate_keypair(bits: int) -> tuple[bytes, bytes]:
 
 
 def write_key(path: Path, data: bytes) -> None:
-    """Persist a key to disk, creating parent folders as needed."""
+    """Lưu khóa vào đĩa, tạo thư mục cha nếu cần."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "wb") as handle:
         handle.write(data)
@@ -31,38 +29,38 @@ def write_key(path: Path, data: bytes) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Generate RSA public/private key pair for steganography."
+        description="Tạo cặp khóa public/private RSA cho steganography."
     )
     parser.add_argument(
         "--bits",
         type=int,
         default=2048,
         choices=(1024, 2048, 3072, 4096),
-        help="Key length in bits (default: 2048).",
+        help="Độ dài khóa theo bit (mặc định: 2048).",
     )
     parser.add_argument(
         "--public",
         type=Path,
         default=Path("public_key.pem"),
-        help="Destination path for the public key.",
+        help="Đường dẫn lưu khóa public.",
     )
     parser.add_argument(
         "--private",
         type=Path,
         default=Path("private_key.pem"),
-        help="Destination path for the private key.",
+        help="Đường dẫn lưu khóa private.",
     )
     args = parser.parse_args()
 
-    print(f"🔑 Generating RSA keypair ({args.bits} bits)...")
+    print(f"Đang tạo cặp khóa RSA ({args.bits} bits)...")
     public_key, private_key = generate_keypair(args.bits)
 
     write_key(args.public, public_key)
     write_key(args.private, private_key)
 
-    print(f"✅ Saved public key to: {args.public}")
-    print(f"✅ Saved private key to: {args.private}")
-    print("⚠️  Keep the private key safe!")
+    print(f"Đã lưu khóa public vào: {args.public}")
+    print(f"Đã lưu khóa private vào: {args.private}")
+    print("Hãy giữ an toàn khóa private!")
 
 
 if __name__ == "__main__":

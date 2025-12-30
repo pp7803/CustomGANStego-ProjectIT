@@ -1,28 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-RUNSTEGO - All-in-one Steganography Tool
-========================================
+RUNSTEGO - Công Cụ Steganography Tất Cả Trong Một
 
-Encode, Decode, and Reverse steganography with optional RSA+AES encryption.
+Mã hóa, Giải mã, và Đảo ngược steganography với tùy chọn mã hóa RSA+AES.
 
-Usage:
-    python runstego.py encode <image> <text> [options]
-    python runstego.py decode <stego_image> [options]
-    python runstego.py reverse <stego_image> [options]
+Cách dùng:
+    python runstego.py encode <ảnh> <văn_bản> [tùy_chọn]
+    python runstego.py decode <ảnh_stego> [tùy_chọn]
+    python runstego.py reverse <ảnh_stego> [tùy_chọn]
 
-Examples:
-    # Encode (hide message in image)
+Ví dụ:
+    # Encode (ẩn message vào ảnh)
     python runstego.py encode cover.png "Secret message"
     python runstego.py encode cover.png "Confidential" --encrypt
     python runstego.py encode cover.png "Hello" --output stego.png
     
-    # Decode (extract message from stego image)
+    # Decode (trích xuất message từ ảnh stego)
     python runstego.py decode stego.png
     python runstego.py decode stego.png --output secret.txt
     python runstego.py decode stego.png --encrypt --private-key private_key.pem
     
-    # Reverse (recover original cover image)
+    # Reverse (khôi phục ảnh cover gốc)
     python runstego.py reverse stego.png
     python runstego.py reverse stego.png --output recovered.png
 """
@@ -38,15 +35,13 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# Fix import path when running from any directory
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from enhancedstegan import encode_message, decode_message, reverse_hiding
 
-# Try to import crypto libraries
 try:
     from Crypto.PublicKey import RSA
     from Crypto.Cipher import AES, PKCS1_OAEP
@@ -57,15 +52,15 @@ except ImportError:
     CRYPTO_AVAILABLE = False
 
 
-# ==================== UTILITY FUNCTIONS ====================
+# UTILITY FUNCTIONS
 
 def compute_image_metrics(img1_path, img2_path):
     """
-    Compute PSNR and correlation between two images.
+    Tính toán PSNR và correlation giữa hai ảnh.
     
     Args:
-        img1_path: Path to first image
-        img2_path: Path to second image
+        img1_path: Đường dẫn ảnh thứ nhất
+        img2_path: Đường dẫn ảnh thứ hai
         
     Returns:
         tuple: (mse, psnr, correlation)
@@ -73,20 +68,16 @@ def compute_image_metrics(img1_path, img2_path):
     img1 = np.array(Image.open(img1_path).convert('RGB')).astype(np.float32)
     img2 = np.array(Image.open(img2_path).convert('RGB')).astype(np.float32)
     
-    # Normalize to [0, 1]
     img1 = img1 / 255.0
     img2 = img2 / 255.0
     
-    # MSE
     mse = np.mean((img1 - img2) ** 2)
     
-    # PSNR (max pixel value = 1.0 for normalized images)
     if mse == 0:
         psnr = float('inf')
     else:
         psnr = 10 * np.log10(1.0 / mse)
     
-    # Correlation
     correlation = np.corrcoef(img1.flatten(), img2.flatten())[0, 1]
     
     return mse, psnr, correlation
@@ -94,22 +85,19 @@ def compute_image_metrics(img1_path, img2_path):
 
 def create_comparison_image(cover_path, stego_path, recovered_path=None, output_path='comparison.png'):
     """
-    Create a comparison visualization showing cover, stego, recovered, and difference images.
+    Tạo ảnh so sánh hiển thị cover, stego, recovered và ảnh chênh lệch.
     
     Args:
-        cover_path: Path to original cover image
-        stego_path: Path to stego image
-        recovered_path: Optional path to recovered image (for reverse hiding)
-        output_path: Where to save the comparison image
+        cover_path: Đường dẫn ảnh cover gốc
+        stego_path: Đường dẫn ảnh stego
+        recovered_path: Đường dẫn tùy chọn tới ảnh đã khôi phục (cho reverse hiding)
+        output_path: Nơi lưu ảnh so sánh
     """
-    # Load images
     cover_img = Image.open(cover_path).convert('RGB')
     stego_img = Image.open(stego_path).convert('RGB')
     
-    # Compute metrics
     mse_stego, psnr_stego, corr_stego = compute_image_metrics(cover_path, stego_path)
     
-    # Determine layout
     if recovered_path and os.path.exists(recovered_path):
         recovered_img = Image.open(recovered_path).convert('RGB')
         mse_recov, psnr_recov, corr_recov = compute_image_metrics(cover_path, recovered_path)
@@ -119,34 +107,31 @@ def create_comparison_image(cover_path, stego_path, recovered_path=None, output_
         fig, axes = plt.subplots(2, 2, figsize=(12, 10))
         has_recovered = False
     
-    # Row 1: Original images
     axes[0, 0].imshow(cover_img)
-    axes[0, 0].set_title('Original Cover Image', fontsize=12, fontweight='bold')
+    axes[0, 0].set_title('Ảnh Cover Gốc', fontsize=12, fontweight='bold')
     axes[0, 0].axis('off')
     
     axes[0, 1].imshow(stego_img)
-    axes[0, 1].set_title(f'Stego Image\nPSNR: {psnr_stego:.2f} dB | MSE: {mse_stego:.6f}', fontsize=11)
+    axes[0, 1].set_title(f'Ảnh Stego\nPSNR: {psnr_stego:.2f} dB | MSE: {mse_stego:.6f}', fontsize=11)
     axes[0, 1].axis('off')
     
     if has_recovered:
         axes[0, 2].imshow(recovered_img)
-        axes[0, 2].set_title(f'Recovered Image\nPSNR: {psnr_recov:.2f} dB | MSE: {mse_recov:.6f}', fontsize=11)
+        axes[0, 2].set_title(f'Ảnh Đã Khôi Phục\nPSNR: {psnr_recov:.2f} dB | MSE: {mse_recov:.6f}', fontsize=11)
         axes[0, 2].axis('off')
     
-    # Row 2: Difference images (amplified for visibility)
     cover_np = np.array(cover_img).astype(float)
     stego_np = np.array(stego_img).astype(float)
     
     axes[1, 0].imshow(np.zeros_like(cover_np, dtype=np.uint8))
-    axes[1, 0].set_title('Reference (Black)', fontsize=12, fontweight='bold')
+    axes[1, 0].set_title('Tham Chiếu (Đen)', fontsize=12, fontweight='bold')
     axes[1, 0].axis('off')
     
-    # Difference: Cover - Stego (amplified 10x)
     diff_stego = np.abs(cover_np - stego_np)
     diff_stego_amp = (diff_stego * 10).clip(0, 255).astype(np.uint8)
     axes[1, 1].imshow(diff_stego_amp)
     max_diff_stego = diff_stego.max()
-    axes[1, 1].set_title(f'Diff: Cover - Stego (10x)\nMax diff: {max_diff_stego:.2f}', fontsize=11)
+    axes[1, 1].set_title(f'Chênh lệch: Cover - Stego (10x)\nChênh lệch tối đa: {max_diff_stego:.2f}', fontsize=11)
     axes[1, 1].axis('off')
     
     if has_recovered:
@@ -155,11 +140,10 @@ def create_comparison_image(cover_path, stego_path, recovered_path=None, output_
         diff_recov_amp = (diff_recov * 10).clip(0, 255).astype(np.uint8)
         axes[1, 2].imshow(diff_recov_amp)
         max_diff_recov = diff_recov.max()
-        axes[1, 2].set_title(f'Diff: Cover - Recovered (10x)\nMax diff: {max_diff_recov:.2f}', fontsize=11)
+        axes[1, 2].set_title(f'Chênh lệch: Cover - Recovered (10x)\nChênh lệch tối đa: {max_diff_recov:.2f}', fontsize=11)
         axes[1, 2].axis('off')
     
-    # Overall title
-    title = 'Steganography Comparison'
+    title = 'So Sánh Steganography'
     if has_recovered:
         title += f'\nCover→Stego: {psnr_stego:.2f} dB | Cover→Recovered: {psnr_recov:.2f} dB'
     else:
@@ -168,13 +152,11 @@ def create_comparison_image(cover_path, stego_path, recovered_path=None, output_
     plt.suptitle(title, fontsize=14, fontweight='bold')
     plt.tight_layout()
     
-    # Save
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
     
-    print(f"📊 Comparison image saved: {output_path}")
+    print(f"Ảnh so sánh đã lưu: {output_path}")
     
-    # Return metrics for display
     return {
         'stego': {'mse': mse_stego, 'psnr': psnr_stego, 'corr': corr_stego},
         'recovered': {'mse': mse_recov, 'psnr': psnr_recov, 'corr': corr_recov} if has_recovered else None
@@ -183,19 +165,18 @@ def create_comparison_image(cover_path, stego_path, recovered_path=None, output_
 
 def pack_encrypted_payload(encrypted_aes_key: bytes, encrypted_aes_iv: bytes, ciphertext: bytes) -> bytes:
     """
-    Pack encrypted data into compact binary format (instead of JSON + base64).
+    Đóng gói dữ liệu mã hóa vào định dạng nhị phân nhỏ gọn (thay vì JSON + base64).
     
-    Format:
+    Định dạng:
         [2 bytes: key_len] [key_len bytes: encrypted_key]
         [2 bytes: iv_len] [iv_len bytes: encrypted_iv]
-        [rest: ciphertext]
+        [phần còn lại: ciphertext]
     
-    This reduces payload from ~750 bytes (JSON+base64) to ~530 bytes (binary).
+    Điều này giảm payload từ ~750 bytes (JSON+base64) xuống ~530 bytes (nhị phân).
     """
     key_len = len(encrypted_aes_key)
     iv_len = len(encrypted_aes_iv)
     
-    # Pack: H = unsigned short (2 bytes)
     packed = struct.pack(f'H{key_len}sH{iv_len}s', 
                          key_len, encrypted_aes_key,
                          iv_len, encrypted_aes_iv)
@@ -206,37 +187,33 @@ def pack_encrypted_payload(encrypted_aes_key: bytes, encrypted_aes_iv: bytes, ci
 
 def unpack_encrypted_payload(packed_data: bytes) -> tuple[bytes, bytes, bytes]:
     """
-    Unpack binary encrypted payload.
+    Giải nén payload mã hóa nhị phân.
     
     Returns:
         (encrypted_aes_key, encrypted_aes_iv, ciphertext)
     """
     offset = 0
     
-    # Read key length and key
     key_len = struct.unpack('H', packed_data[offset:offset+2])[0]
     offset += 2
     encrypted_aes_key = packed_data[offset:offset+key_len]
     offset += key_len
     
-    # Read IV length and IV
     iv_len = struct.unpack('H', packed_data[offset:offset+2])[0]
     offset += 2
     encrypted_aes_iv = packed_data[offset:offset+iv_len]
     offset += iv_len
     
-    # Rest is ciphertext
     ciphertext = packed_data[offset:]
     
     return encrypted_aes_key, encrypted_aes_iv, ciphertext
 
 
 def find_best_model(models_dir='results/model'):
-    """Find best model by accuracy, PSNR, and reverse PSNR from results/model"""
+    """Tìm model tốt nhất theo accuracy, PSNR, và reverse PSNR từ results/model"""
     if not os.path.isdir(models_dir):
         return None
     
-    # Pattern: EN_DE_REV_ep{epoch}_acc{acc}_psnr{psnr}_rpsnr{rpsnr}_{timestamp}.dat
     pattern = re.compile(r'acc([0-9]*\.?[0-9]+).*psnr([0-9]*\.?[0-9]+).*rpsnr([0-9]*\.?[0-9]+)')
     best = None
     best_score = -1.0
@@ -254,7 +231,6 @@ def find_best_model(models_dir='results/model'):
         except:
             continue
         
-        # Weighted scoring: accuracy (60%) + PSNR (25%) + reverse PSNR (15%)
         score = (acc - 0.9) * 100 * 0.6 + (psnr - 25) * 0.25 + (rpsnr - 25) * 0.15
         
         if score > best_score:
@@ -265,34 +241,33 @@ def find_best_model(models_dir='results/model'):
 
 
 def get_model_path(model_arg):
-    """Get model path, auto-select if not specified"""
+    """Lấy đường dẫn model, tự động chọn nếu không chỉ định"""
     if model_arg:
         return model_arg
     
     model = find_best_model()
     if model:
-        print(f"🤖 Using best model: {os.path.basename(model)}")
+        print(f"Đang sử dụng model tốt nhất: {os.path.basename(model)}")
         return model
     
-    # Fallback
     if os.path.exists('image_models/a.dat'):
         return 'image_models/a.dat'
     
-    print("❌ No model found. Train a model first: python train.py")
+    print("Không tìm thấy model. Hãy huấn luyện model trước: python train.py")
     return None
 
 
-# ==================== ENCRYPTION FUNCTIONS ====================
+# ENCRYPTION FUNCTIONS
 
 def encrypt_with_aes(plaintext: str, key: bytes, iv: bytes) -> bytes:
-    """Encrypt plaintext using AES-256-CBC."""
+    """Mã hóa plaintext sử dụng AES-256-CBC."""
     cipher = AES.new(key, AES.MODE_CBC, iv)
     padded_data = pad(plaintext.encode('utf-8'), AES.block_size)
     return cipher.encrypt(padded_data)
 
 
 def encrypt_with_rsa(data: bytes, public_key_path: Path) -> bytes:
-    """Encrypt data using RSA public key."""
+    """Mã hóa dữ liệu sử dụng khóa public RSA."""
     with open(public_key_path, 'rb') as f:
         public_key = RSA.import_key(f.read())
     cipher = PKCS1_OAEP.new(public_key)
@@ -300,7 +275,7 @@ def encrypt_with_rsa(data: bytes, public_key_path: Path) -> bytes:
 
 
 def decrypt_with_rsa(encrypted_data: bytes, private_key_path: Path) -> bytes:
-    """Decrypt data using RSA private key."""
+    """Giải mã dữ liệu sử dụng khóa private RSA."""
     with open(private_key_path, 'rb') as f:
         private_key = RSA.import_key(f.read())
     cipher = PKCS1_OAEP.new(private_key)
@@ -308,84 +283,74 @@ def decrypt_with_rsa(encrypted_data: bytes, private_key_path: Path) -> bytes:
 
 
 def decrypt_with_aes(ciphertext: bytes, key: bytes, iv: bytes) -> str:
-    """Decrypt ciphertext using AES-256-CBC."""
+    """Giải mã ciphertext sử dụng AES-256-CBC."""
     cipher = AES.new(key, AES.MODE_CBC, iv)
     decrypted_padded = cipher.decrypt(ciphertext)
     plaintext = unpad(decrypted_padded, AES.block_size)
     return plaintext.decode('utf-8')
 
 
-# ==================== COMMAND HANDLERS ====================
+# COMMAND HANDLERS
 
 def cmd_encode(args):
-    """Handle encode command"""
-    # Auto-generate output filename if not specified
+    """Xử lý lệnh encode"""
     if args.output is None:
         input_path = Path(args.image)
         args.output = f"stego_{input_path.stem}.png"
     
-    # Get model path
     model_path = get_model_path(args.model)
     if not model_path:
         return 1
     
-    # Validate inputs
     if not os.path.exists(args.image):
-        print(f"❌ Cover image not found: {args.image}")
+        print(f"Không tìm thấy ảnh cover: {args.image}")
         return 1
     
     if not os.path.exists(model_path):
-        print(f"❌ Model checkpoint not found: {model_path}")
+        print(f"Không tìm thấy checkpoint model: {model_path}")
         return 1
     
-    # Handle encryption
     if args.encrypt:
         if not CRYPTO_AVAILABLE:
-            print("❌ Encryption requires pycryptodome. Install: pip install pycryptodome")
+            print("Mã hóa yêu cầu pycryptodome. Cài đặt: pip install pycryptodome")
             return 1
         
         if not os.path.exists(args.public_key):
-            print(f"⚠️  Public key not found: {args.public_key}")
-            print("   Generating RSA keypair...")
+            print(f"Không tìm thấy khóa public: {args.public_key}")
+            print("   Đang tạo cặp khóa RSA...")
             os.system("python genRSA.py")
             if not os.path.exists(args.public_key):
-                print("❌ Failed to generate keys")
+                print("Không thể tạo khóa")
                 return 1
         
-        print("🔐 Starting encryption process...")
-        print(f"📄 Secret text: {args.text}")
+        print("Đang bắt đầu quá trình mã hóa...")
+        print(f"Văn bản bí mật: {args.text}")
         
-        # Step 1: Generate random AES key and IV
         aes_key = get_random_bytes(32)  # 256 bits
         aes_iv = get_random_bytes(16)   # 128 bits
-        print(f"🔑 Generated AES-256 key: {len(aes_key)} bytes")
-        print(f"🔑 Generated IV: {len(aes_iv)} bytes")
+        print(f"Đã tạo khóa AES-256: {len(aes_key)} bytes")
+        print(f"Đã tạo IV: {len(aes_iv)} bytes")
         
-        # Step 2: Encrypt plaintext with AES
         ciphertext = encrypt_with_aes(args.text, aes_key, aes_iv)
-        print(f"✅ AES encrypted ciphertext: {len(ciphertext)} bytes")
+        print(f"Ciphertext đã mã hóa AES: {len(ciphertext)} bytes")
         
-        # Step 3: Encrypt AES key and IV with RSA
         encrypted_aes_key = encrypt_with_rsa(aes_key, Path(args.public_key))
         encrypted_aes_iv = encrypt_with_rsa(aes_iv, Path(args.public_key))
-        print(f"✅ RSA encrypted AES key: {len(encrypted_aes_key)} bytes")
-        print(f"✅ RSA encrypted IV: {len(encrypted_aes_iv)} bytes")
+        print(f"Khóa AES đã mã hóa RSA: {len(encrypted_aes_key)} bytes")
+        print(f"IV đã mã hóa RSA: {len(encrypted_aes_iv)} bytes")
         
-        # Step 4: Pack payload in compact binary format (NOT JSON + base64)
         packed_payload = pack_encrypted_payload(encrypted_aes_key, encrypted_aes_iv, ciphertext)
         
-        # Convert binary to base64 for text transmission
         message_to_hide = base64.b64encode(packed_payload).decode('utf-8')
         
-        print(f"📦 Encrypted payload size: {len(message_to_hide)} bytes (binary format)")
-        print(f"   ↳ Original JSON format would be ~{len(json.dumps({'aeskey': base64.b64encode(encrypted_aes_key).decode(), 'aesiv': base64.b64encode(encrypted_aes_iv).decode(), 'ciphertext': base64.b64encode(ciphertext).decode()}))} bytes")
+        print(f"Kích thước payload đã mã hóa: {len(message_to_hide)} bytes (định dạng nhị phân)")
+        print(f"   Định dạng JSON gốc sẽ là ~{len(json.dumps({'aeskey': base64.b64encode(encrypted_aes_key).decode(), 'aesiv': base64.b64encode(encrypted_aes_iv).decode(), 'ciphertext': base64.b64encode(ciphertext).decode()}))} bytes")
     else:
-        print("📝 Encoding without encryption...")
-        print(f"📄 Secret text: {args.text}")
+        print("Đang mã hóa không có encryption...")
+        print(f"Văn bản bí mật: {args.text}")
         message_to_hide = args.text
     
-    # Hide message in image
-    print(f"🖼️  Encoding into image: {args.image}")
+    print(f"Đang mã hóa vào ảnh: {args.image}")
     try:
         encode_message(
             cover_image_path=args.image,
@@ -394,22 +359,21 @@ def cmd_encode(args):
             model_path=model_path
         )
     except Exception as e:
-        print(f"❌ Encoding failed: {e}")
+        print(f"Mã hóa thất bại: {e}")
         return 1
     
     print(f"\n{'='*60}")
-    print(f"✅ SUCCESS!")
+    print(f"THÀNH CÔNG!")
     print(f"{'='*60}")
-    print(f"📤 Original text: {args.text}")
+    print(f"Văn bản gốc: {args.text}")
     if args.encrypt:
-        print(f"🔐 Encryption: AES-256-CBC + RSA-2048")
+        print(f"Mã hóa: AES-256-CBC + RSA-2048")
     else:
-        print(f"📝 Encryption: None (plain text)")
-    print(f"💾 Stego image: {args.output}")
+        print(f"Mã hóa: Không (văn bản thường)")
+    print(f"Ảnh stego: {args.output}")
     
-    # Generate comparison image if requested
     if args.compare:
-        print(f"\n📊 Generating comparison image...")
+        print(f"\nĐang tạo ảnh so sánh...")
         comparison_path = f"comparison_{Path(args.output).stem}.png"
         try:
             metrics = create_comparison_image(
@@ -418,145 +382,130 @@ def cmd_encode(args):
                 recovered_path=None,
                 output_path=comparison_path
             )
-            print(f"\n📈 Image Quality Metrics:")
+            print(f"\nCác Chỉ Số Chất Lượng Ảnh:")
             print(f"   PSNR (Cover→Stego): {metrics['stego']['psnr']:.2f} dB")
             print(f"   MSE:  {metrics['stego']['mse']:.6f}")
             print(f"   Correlation: {metrics['stego']['corr']:.4f}")
-            print(f"💾 Comparison saved: {comparison_path}")
+            print(f"So sánh đã lưu: {comparison_path}")
         except Exception as e:
-            print(f"⚠️  Warning: Failed to create comparison image: {e}")
+            print(f"Cảnh báo: Không thể tạo ảnh so sánh: {e}")
     
     print(f"{'='*60}")
     return 0
 
 
 def cmd_decode(args):
-    """Handle decode command"""
-    # Get model path
+    """Xử lý lệnh decode"""
     model_path = get_model_path(args.model)
     if not model_path:
         return 1
     
-    # Validate inputs
     if not os.path.exists(args.image):
-        print(f"❌ Stego image not found: {args.image}")
+        print(f"Không tìm thấy ảnh stego: {args.image}")
         return 1
     
     if not os.path.exists(model_path):
-        print(f"❌ Model checkpoint not found: {model_path}")
+        print(f"Không tìm thấy checkpoint model: {model_path}")
         return 1
     
-    # Handle decryption
     if args.encrypt:
         if not CRYPTO_AVAILABLE:
-            print("❌ Decryption requires pycryptodome. Install: pip install pycryptodome")
+            print("Giải mã yêu cầu pycryptodome. Cài đặt: pip install pycryptodome")
             return 1
         
         if not os.path.exists(args.private_key):
-            print(f"❌ Private key not found: {args.private_key}")
-            print("💡 Generate keys first: python genRSA.py")
+            print(f"Không tìm thấy khóa private: {args.private_key}")
+            print("Hãy tạo khóa trước: python genRSA.py")
             return 1
         
-        print("🔓 Starting decryption process...")
+        print("Đang bắt đầu quá trình giải mã...")
     else:
-        print("🔍 Extracting message...")
+        print("Đang trích xuất message...")
     
-    print(f"🖼️  Stego image: {args.image}")
+    print(f"Ảnh stego: {args.image}")
     
-    # Extract hidden message from image
     try:
         extracted_message = decode_message(
             stego_image_path=args.image,
             model_path=model_path
         )
     except Exception as e:
-        print(f"❌ Decoding failed: {e}")
+        print(f"Giải mã thất bại: {e}")
         return 1
     
-    print(f"✅ Extracted payload: {len(extracted_message)} bytes")
+    print(f"Đã trích xuất payload: {len(extracted_message)} bytes")
     
-    # Handle encrypted vs plain message
     if args.encrypt:
-        # Unpack binary encrypted payload
         try:
-            # Try binary format first (new format)
             packed_data = base64.b64decode(extracted_message)
             encrypted_aes_key, encrypted_aes_iv, ciphertext = unpack_encrypted_payload(packed_data)
-            print(f"✅ Unpacked binary payload (new format)")
+            print(f"Đã giải nén payload nhị phân (định dạng mới)")
         except Exception as e1:
-            # Fallback to JSON format (old format - for backward compatibility)
             try:
                 payload = json.loads(extracted_message)
                 encrypted_aes_key = base64.b64decode(payload["aeskey"])
                 encrypted_aes_iv = base64.b64decode(payload["aesiv"])
                 ciphertext = base64.b64decode(payload["ciphertext"])
-                print(f"✅ Parsed JSON payload (old format)")
+                print(f"Đã phân tích payload JSON (định dạng cũ)")
             except Exception as e2:
-                print(f"❌ Failed to parse encrypted payload:")
-                print(f"   Binary format error: {e1}")
-                print(f"   JSON format error: {e2}")
-                print("💡 Maybe the message was not encrypted? Try without --encrypt flag.")
+                print(f"Không thể phân tích payload mã hóa:")
+                print(f"   Lỗi định dạng nhị phân: {e1}")
+                print(f"   Lỗi định dạng JSON: {e2}")
+                print("Có thể message không được mã hóa? Thử không dùng cờ --encrypt.")
                 return 1
         
-        # Decrypt AES key and IV with RSA
         try:
             aes_key = decrypt_with_rsa(encrypted_aes_key, Path(args.private_key))
             aes_iv = decrypt_with_rsa(encrypted_aes_iv, Path(args.private_key))
-            print(f"✅ RSA decrypted AES key and IV")
+            print(f"Đã giải mã RSA khóa AES và IV")
         except Exception as e:
-            print(f"❌ RSA decryption failed: {e}")
+            print(f"Giải mã RSA thất bại: {e}")
             return 1
         
-        # Decrypt ciphertext with AES
         try:
             secret_message = decrypt_with_aes(ciphertext, aes_key, aes_iv)
-            print(f"✅ AES decrypted ciphertext")
+            print(f"Đã giải mã AES ciphertext")
         except Exception as e:
-            print(f"❌ AES decryption failed: {e}")
+            print(f"Giải mã AES thất bại: {e}")
             return 1
     else:
         secret_message = extracted_message
     
-    # Output result
     print(f"\n{'='*60}")
-    print(f"✅ SUCCESS!")
+    print(f"THÀNH CÔNG!")
     print(f"{'='*60}")
-    print(f"📤 Recovered message:")
+    print(f"Message đã khôi phục:")
     print(f"{secret_message}")
     print(f"{'='*60}")
     
     if args.output:
         Path(args.output).write_text(secret_message, encoding='utf-8')
-        print(f"💾 Saved to: {args.output}")
+        print(f"Đã lưu vào: {args.output}")
     
     return 0
 
 
 def cmd_reverse(args):
-    """Handle reverse command"""
-    # Auto-generate output filename if not specified
+    """Xử lý lệnh reverse"""
     if args.output is None:
         input_path = Path(args.image)
         args.output = f"{input_path.stem}_recovered{input_path.suffix}"
     
-    # Get model path
     model_path = get_model_path(args.model)
     if not model_path:
         return 1
     
-    # Validate inputs
     if not os.path.exists(args.image):
-        print(f"❌ Stego image not found: {args.image}")
+        print(f"Không tìm thấy ảnh stego: {args.image}")
         return 1
     
     if not os.path.exists(model_path):
-        print(f"❌ Model checkpoint not found: {model_path}")
+        print(f"Không tìm thấy checkpoint model: {model_path}")
         return 1
     
-    print("🔄 Starting reverse hiding process...")
-    print(f"🖼️  Stego image: {args.image}")
+    print("Đang bắt đầu quá trình reverse hiding...")
+    print(f"Ảnh stego: {args.image}")
     
-    # Perform reverse hiding
     try:
         reverse_hiding(
             stego_image_path=args.image,
@@ -564,22 +513,21 @@ def cmd_reverse(args):
             model_path=model_path
         )
     except Exception as e:
-        print(f"❌ Reverse hiding failed: {e}")
+        print(f"Reverse hiding thất bại: {e}")
         return 1
     
     print(f"\n{'='*60}")
-    print(f"✅ SUCCESS!")
+    print(f"THÀNH CÔNG!")
     print(f"{'='*60}")
-    print(f"📥 Stego image: {args.image}")
-    print(f"📤 Recovered cover: {args.output}")
+    print(f"Ảnh stego: {args.image}")
+    print(f"Cover đã khôi phục: {args.output}")
     
-    # Generate comparison image if requested and cover image provided
     if args.compare and args.cover:
         if not os.path.exists(args.cover):
-            print(f"⚠️  Warning: Cover image not found: {args.cover}")
-            print(f"   Skipping comparison generation.")
+            print(f"Không tìm thấy ảnh cover: {args.cover}")
+            print(f"   Bỏ qua việc tạo so sánh.")
         else:
-            print(f"\n📊 Generating comparison image...")
+            print(f"\nĐang tạo ảnh so sánh...")
             comparison_path = f"comparison_reverse_{Path(args.output).stem}.png"
             try:
                 metrics = create_comparison_image(
@@ -588,50 +536,49 @@ def cmd_reverse(args):
                     recovered_path=args.output,
                     output_path=comparison_path
                 )
-                print(f"\n📈 Image Quality Metrics:")
+                print(f"\nCác Chỉ Số Chất Lượng Ảnh:")
                 print(f"   PSNR (Cover→Stego):     {metrics['stego']['psnr']:.2f} dB")
                 print(f"   PSNR (Cover→Recovered): {metrics['recovered']['psnr']:.2f} dB")
-                print(f"   Recovery Quality: {metrics['recovered']['corr']:.4f}")
-                print(f"💾 Comparison saved: {comparison_path}")
+                print(f"   Chất lượng khôi phục: {metrics['recovered']['corr']:.4f}")
+                print(f"So sánh đã lưu: {comparison_path}")
             except Exception as e:
-                print(f"⚠️  Warning: Failed to create comparison image: {e}")
+                print(f"Cảnh báo: Không thể tạo ảnh so sánh: {e}")
     elif args.compare:
-        print(f"\n⚠️  Note: --compare requires --cover <original_image> to generate comparison")
+        print(f"\nLưu ý: --compare yêu cầu --cover <ảnh_gốc> để tạo so sánh")
     
     print(f"{'='*60}")
     
     return 0
 
 
-# ==================== MAIN ====================
+# MAIN
 
 def main():
-    # Create main parser with examples in epilog
     parser = argparse.ArgumentParser(
         prog='runstego',
-        description='🔐 All-in-one Steganography Tool - Encode, Decode, and Reverse',
+        description='Công Cụ Steganography Tất Cả Trong Một - Mã hóa, Giải mã và Đảo ngược',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📚 EXAMPLES:
+EXAMPLES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔒 ENCODE (Hide message in image):
+ENCODE (Hide message in image):
   python runstego.py encode cover.png "Secret message"
   python runstego.py encode cover.png "Confidential" --encrypt
   python runstego.py encode cover.png "Hello" --output stego.png
 
-🔓 DECODE (Extract message from stego image):
+DECODE (Extract message from stego image):
   python runstego.py decode stego.png
   python runstego.py decode stego.png --output secret.txt
   python runstego.py decode stego.png --encrypt
 
- REVERSE (Recover original cover image):
+REVERSE (Recover original cover image):
   python runstego.py reverse stego.png
   python runstego.py reverse stego.png --output recovered.png
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💡 WORKFLOW EXAMPLE:
+WORKFLOW EXAMPLE:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   # 1. Hide a secret message (with encryption)
@@ -661,61 +608,61 @@ Examples:
   python runstego.py encode cover.png "Hello" --output stego.png
         """
     )
-    encode_parser.add_argument('image', type=str, help='Cover image path')
-    encode_parser.add_argument('text', type=str, help='Secret text to hide')
+    encode_parser.add_argument('image', type=str, help='Đường dẫn ảnh cover')
+    encode_parser.add_argument('text', type=str, help='Văn bản bí mật để ẩn')
     encode_parser.add_argument('--output', '-o', type=str, default=None,
-                               help='Output stego image path (default: stego_<input>.png)')
+                               help='Đường dẫn ảnh stego đầu ra (mặc định: stego_<input>.png)')
     encode_parser.add_argument('--encrypt', '-e', action='store_true',
-                               help='Enable RSA+AES encryption')
+                               help='Bật mã hóa RSA+AES')
     encode_parser.add_argument('--public-key', type=str, default='public_key.pem',
-                               help='RSA public key path (default: public_key.pem)')
+                               help='Đường dẫn khóa công khai RSA (mặc định: public_key.pem)')
     encode_parser.add_argument('--model', '-m', type=str, default=None,
-                               help='Model checkpoint path (auto-selects best if not specified)')
+                               help='Đường dẫn checkpoint model (tự chọn tốt nhất nếu không chỉ định)')
     encode_parser.add_argument('--compare', '-c', action='store_true',
-                               help='Generate comparison image showing cover vs stego with metrics')
+                               help='Tạo ảnh so sánh hiển thị cover vs stego với các chỉ số')
     
     # ===== DECODE subcommand =====
     decode_parser = subparsers.add_parser(
         'decode',
-        help='Extract secret message from stego image',
+        help='Trích xuất thông điệp bí mật từ ảnh stego',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
+Ví dụ:
   python runstego.py decode stego.png
   python runstego.py decode stego.png --output secret.txt
   python runstego.py decode stego.png --encrypt
         """
     )
-    decode_parser.add_argument('image', type=str, help='Stego image path')
+    decode_parser.add_argument('image', type=str, help='Đường dẫn ảnh stego')
     decode_parser.add_argument('--output', '-o', type=str, default=None,
-                               help='Output text file (default: print to console)')
+                               help='File văn bản đầu ra (mặc định: in ra console)')
     decode_parser.add_argument('--encrypt', '-e', action='store_true',
-                               help='Decrypt with RSA+AES')
+                               help='Giải mã với RSA+AES')
     decode_parser.add_argument('--private-key', type=str, default='private_key.pem',
-                               help='RSA private key path (default: private_key.pem)')
+                               help='Đường dẫn khóa riêng tư RSA (mặc định: private_key.pem)')
     decode_parser.add_argument('--model', '-m', type=str, default=None,
-                               help='Model checkpoint path (auto-selects best if not specified)')
+                               help='Đường dẫn checkpoint model (tự chọn tốt nhất nếu không chỉ định)')
     
     # ===== REVERSE subcommand =====
     reverse_parser = subparsers.add_parser(
         'reverse',
-        help='Recover original cover image from stego',
+        help='Khôi phục ảnh cover gốc từ stego',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
+Ví dụ:
   python runstego.py reverse stego.png
   python runstego.py reverse stego.png --output recovered.png
         """
     )
-    reverse_parser.add_argument('image', type=str, help='Stego image path')
+    reverse_parser.add_argument('image', type=str, help='Đường dẫn ảnh stego')
     reverse_parser.add_argument('--output', '-o', type=str, default=None,
-                                help='Output recovered image (default: <input>_recovered.png)')
+                                help='Ảnh khôi phục đầu ra (mặc định: <input>_recovered.png)')
     reverse_parser.add_argument('--cover', type=str, default=None,
-                                help='Original cover image path (required for comparison)')
+                                help='Đường dẫn ảnh cover gốc (cần để so sánh)')
     reverse_parser.add_argument('--model', '-m', type=str, default=None,
-                                help='Model checkpoint path (auto-selects best if not specified)')
+                                help='Đường dẫn checkpoint model (tự chọn tốt nhất nếu không chỉ định)')
     reverse_parser.add_argument('--compare', '-c', action='store_true',
-                                help='Generate comparison image showing cover/stego/recovered with metrics')
+                                help='Tạo ảnh so sánh hiển thị cover/stego/khôi-phục với các chỉ số')
     
     # Parse arguments
     args = parser.parse_args()
