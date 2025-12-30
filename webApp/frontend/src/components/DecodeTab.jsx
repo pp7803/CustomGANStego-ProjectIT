@@ -26,7 +26,7 @@ function DecodeTab() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
+      setError("Kích thước ảnh phải nhỏ hơn 5MB");
       return;
     }
     setStegoImage(file);
@@ -67,12 +67,12 @@ function DecodeTab() {
     <div className="max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
         <FontAwesomeIcon icon={faLockOpen} className="text-primary-600" />
-        Decode - Extract Hidden Message
+        Giải Mã - Trích Xuất Tin Nhắn Ẩn
       </h2>
 
       <div className="card mb-6">
         <label className="block text-sm font-semibold text-gray-700 mb-3">
-          Input Method
+          Phương Thức Nhập
         </label>
         <div className="flex gap-6">
           <label className="flex items-center cursor-pointer">
@@ -85,7 +85,7 @@ function DecodeTab() {
             />
             <span className="ml-2 text-sm font-medium text-gray-700">
               <FontAwesomeIcon icon={faFile} className="mr-2" />
-              Upload File
+              Tải Lên File
             </span>
           </label>
           <label className="flex items-center cursor-pointer">
@@ -98,7 +98,7 @@ function DecodeTab() {
             />
             <span className="ml-2 text-sm font-medium text-gray-700">
               <FontAwesomeIcon icon={faLink} className="mr-2" />
-              Use URL
+              Sử Dụng URL
             </span>
           </label>
         </div>
@@ -108,9 +108,9 @@ function DecodeTab() {
         {inputMethod === "file" ? (
           <div className="card">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Stego Image <span className="text-red-500">*</span>
+              Ảnh Stego <span className="text-red-500">*</span>
               <span className="text-xs font-normal text-gray-500 ml-2">
-                (Max 5MB)
+                (Tối đa 5MB)
               </span>
             </label>
             <input
@@ -133,7 +133,7 @@ function DecodeTab() {
         ) : (
           <div className="card">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Stego Image URL <span className="text-red-500">*</span>
+              URL Ảnh Stego <span className="text-red-500">*</span>
             </label>
             <input
               type="url"
@@ -156,7 +156,7 @@ function DecodeTab() {
             />
             <span className="ml-3 text-sm font-semibold text-gray-800 flex items-center gap-2">
               <FontAwesomeIcon icon={faShieldAlt} />
-              Use RSA+AES Decryption
+              Sử Dụng Giải Mã RSA+AES
             </span>
           </label>
         </div>
@@ -164,7 +164,7 @@ function DecodeTab() {
         {useDecryption && (
           <div className="card animate-fadeIn">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Private Key (.pem file) <span className="text-red-500">*</span>
+              Khóa Bí Mật (file .pem) <span className="text-red-500">*</span>
             </label>
             <input
               type="file"
@@ -184,12 +184,12 @@ function DecodeTab() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faSpinner} spin />
-              Decoding...
+              Đang giải mã...
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faSearch} />
-              Decode Message
+              Giải Mã Tin Nhắn
             </span>
           )}
         </button>
@@ -199,7 +199,7 @@ function DecodeTab() {
         <div className="mt-8 text-center py-12 bg-primary-50 rounded-xl border-2 border-primary-200">
           <div className="spinner mx-auto mb-4"></div>
           <p className="text-primary-700 font-semibold text-lg">
-            Extracting message...
+            Đang trích xuất tin nhắn...
           </p>
         </div>
       )}
@@ -212,7 +212,7 @@ function DecodeTab() {
               className="text-2xl text-red-500 mr-3"
             />
             <div>
-              <strong className="text-red-800 font-semibold">Error:</strong>
+              <strong className="text-red-800 font-semibold">Lỗi:</strong>
               <p className="text-red-700 mt-1">{error}</p>
             </div>
           </div>
@@ -223,7 +223,7 @@ function DecodeTab() {
         <div className="mt-8 card bg-green-50 border-green-200 border-2">
           <h3 className="text-2xl font-bold text-green-800 mb-4 flex items-center gap-2">
             <FontAwesomeIcon icon={faCheckCircle} />
-            Decoded Message
+            Tin Nhắn Đã Giải Mã
           </h3>
           <div className="bg-white p-6 rounded-lg border-2 border-green-300 whitespace-pre-wrap break-words font-mono text-sm">
             {result}

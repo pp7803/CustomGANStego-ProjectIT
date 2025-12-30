@@ -19,7 +19,7 @@ function ReverseTab() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
+      setError("Kích thước ảnh phải nhỏ hơn 5MB");
       return;
     }
     setStegoImage(file);
@@ -59,15 +59,15 @@ function ReverseTab() {
     <div className="max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
         <FontAwesomeIcon icon={faRotateLeft} className="text-primary-600" />
-        Reverse - Recover Original Image
+        Đảo Ngược - Phục Hồi Ảnh Gốc
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Stego Image <span className="text-red-500">*</span>
+            Ảnh Stego <span className="text-red-500">*</span>
             <span className="text-xs font-normal text-gray-500 ml-2">
-              (Max 5MB)
+              (Tối đa 5MB)
             </span>
           </label>
           <input
@@ -80,7 +80,7 @@ function ReverseTab() {
           {imagePreview && (
             <div className="mt-4">
               <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                Stego Image Preview
+                Xem Trước Ảnh Stego
               </h4>
               <div className="text-center">
                 <img
@@ -101,12 +101,12 @@ function ReverseTab() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faSpinner} spin />
-              Recovering...
+              Đang phục hồi...
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faRotateLeft} />
-              Recover Original Image
+              Phục Hồi Ảnh Gốc
             </span>
           )}
         </button>
@@ -116,7 +116,7 @@ function ReverseTab() {
         <div className="mt-8 text-center py-12 bg-primary-50 rounded-xl border-2 border-primary-200">
           <div className="spinner mx-auto mb-4"></div>
           <p className="text-primary-700 font-semibold text-lg">
-            Recovering original image...
+            Đang phục hồi ảnh gốc...
           </p>
         </div>
       )}
@@ -129,7 +129,7 @@ function ReverseTab() {
               className="text-2xl text-red-500 mr-3"
             />
             <div>
-              <strong className="text-red-800 font-semibold">Error:</strong>
+              <strong className="text-red-800 font-semibold">Lỗi:</strong>
               <p className="text-red-700 mt-1">{error}</p>
             </div>
           </div>
@@ -140,11 +140,11 @@ function ReverseTab() {
         <div className="mt-8 card bg-green-50 border-green-200 border-2">
           <h3 className="text-2xl font-bold text-green-800 mb-4 flex items-center gap-2">
             <FontAwesomeIcon icon={faCheckCircle} />
-            Image Recovered Successfully!
+            Phục Hồi Ảnh Thành Công!
           </h3>
           <button onClick={downloadImage} className="btn-primary mb-4">
             <FontAwesomeIcon icon={faDownload} className="mr-2" />
-            Download Recovered Image
+            Tải Xuống Ảnh Đã Phục Hồi
           </button>
           <div className="text-center bg-white p-4 rounded-lg">
             <img

@@ -25,7 +25,7 @@ function EncodeTab() {
   const handleCoverImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
+      setError("Kích thước ảnh phải nhỏ hơn 5MB");
       return;
     }
     setCoverImage(file);
@@ -65,23 +65,23 @@ function EncodeTab() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(result.stego_url);
-    alert("URL copied to clipboard!");
+    alert("Đã sao chép URL vào bộ nhớ tạm!");
   };
 
   return (
     <div className="max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
         <FontAwesomeIcon icon={faLock} className="text-primary-600" />
-        Encode - Hide Message in Image
+        Mã Hóa - Ẩn Tin Nhắn Trong Ảnh
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Cover Image */}
         <div className="card">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Cover Image <span className="text-red-500">*</span>
+            Ảnh Gốc <span className="text-red-500">*</span>
             <span className="text-xs font-normal text-gray-500 ml-2">
-              (Max 5MB)
+              (Tối đa 5MB)
             </span>
           </label>
           <input
@@ -105,18 +105,18 @@ function EncodeTab() {
         {/* Secret Message */}
         <div className="card">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Secret Message <span className="text-red-500">*</span>
+            Tin Nhắn Bí Mật <span className="text-red-500">*</span>
           </label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Enter your secret message here..."
+            placeholder="Nhập tin nhắn bí mật của bạn ở đây..."
             required
             rows="6"
             className="input-field resize-none"
           />
           <p className="text-xs text-gray-500 mt-2">
-            {message.length} characters
+            {message.length} ký tự
           </p>
         </div>
 
@@ -131,11 +131,11 @@ function EncodeTab() {
             />
             <span className="ml-3 text-sm font-semibold text-gray-800 flex items-center gap-2">
               <FontAwesomeIcon icon={faShieldAlt} />
-              Use RSA+AES Encryption
+              Sử Dụng Mã Hóa RSA+AES
             </span>
           </label>
           <p className="text-xs text-gray-600 mt-2 ml-8">
-            Enable encryption for extra security layer
+            Bật mã hóa để tăng cường bảo mật
           </p>
         </div>
 
@@ -143,7 +143,7 @@ function EncodeTab() {
         {useEncryption && (
           <div className="card animate-fadeIn">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Public Key (.pem file) <span className="text-red-500">*</span>
+              Khóa Công Khai (file .pem) <span className="text-red-500">*</span>
             </label>
             <input
               type="file"
@@ -164,12 +164,12 @@ function EncodeTab() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faSpinner} spin />
-              Encoding...
+              Đang mã hóa...
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faRocket} />
-              Encode Message
+              Mã Hóa Tin Nhắn
             </span>
           )}
         </button>
@@ -180,10 +180,10 @@ function EncodeTab() {
         <div className="mt-8 text-center py-12 bg-primary-50 rounded-xl border-2 border-primary-200">
           <div className="spinner mx-auto mb-4"></div>
           <p className="text-primary-700 font-semibold text-lg">
-            Processing image...
+            Đang xử lý ảnh...
           </p>
           <p className="text-gray-600 text-sm mt-2">
-            This may take a few moments
+            Quá trình này có thể mất vài phút
           </p>
         </div>
       )}
@@ -197,7 +197,7 @@ function EncodeTab() {
               className="text-2xl text-red-500 mr-3"
             />
             <div>
-              <strong className="text-red-800 font-semibold">Error:</strong>
+              <strong className="text-red-800 font-semibold">Lỗi:</strong>
               <p className="text-red-700 mt-1">{error}</p>
             </div>
           </div>
@@ -209,7 +209,7 @@ function EncodeTab() {
         <div className="mt-8 card bg-green-50 border-green-200 border-2">
           <h3 className="text-2xl font-bold text-green-800 mb-4 flex items-center gap-2">
             <FontAwesomeIcon icon={faCheckCircle} />
-            Stego Image Created Successfully!
+            Tạo Ảnh Stego Thành Công!
           </h3>
 
           <div className="flex flex-col md:flex-row gap-3 mb-4">
@@ -224,7 +224,7 @@ function EncodeTab() {
               className="btn-secondary whitespace-nowrap"
             >
               <FontAwesomeIcon icon={faCopy} className="mr-2" />
-              Copy URL
+              Sao Chép URL
             </button>
             <a
               href={result.stego_url}
@@ -232,7 +232,7 @@ function EncodeTab() {
               className="btn-primary whitespace-nowrap text-center"
             >
               <FontAwesomeIcon icon={faDownload} className="mr-2" />
-              Download
+              Tải Xuống
             </a>
           </div>
 

@@ -21,7 +21,7 @@ function CompareTab() {
   const handleImage1Change = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
+      setError("Kích thước ảnh phải nhỏ hơn 5MB");
       return;
     }
     setImage1(file);
@@ -36,7 +36,7 @@ function CompareTab() {
   const handleImage2Change = (e) => {
     const file = e.target.files[0];
     if (file && file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
+      setError("Kích thước ảnh phải nhỏ hơn 5MB");
       return;
     }
     setImage2(file);
@@ -66,26 +66,26 @@ function CompareTab() {
 
   const getQualityBadge = (psnr, ssim) => {
     if (psnr > 40 && ssim > 0.95)
-      return { text: "Excellent", color: "bg-green-500" };
+      return { text: "Xuất Sắc", color: "bg-green-500" };
     if (psnr > 30 && ssim > 0.9)
-      return { text: "Good", color: "bg-yellow-500" };
-    return { text: "Fair", color: "bg-red-500" };
+      return { text: "Tốt", color: "bg-yellow-500" };
+    return { text: "Khá", color: "bg-red-500" };
   };
 
   return (
     <div className="max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
         <FontAwesomeIcon icon={faChartBar} className="text-primary-600" />
-        Compare - Calculate Image Metrics
+        So Sánh - Tính Toán Chỉ Số Ảnh
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
           <div className="card">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Image 1 (Original/Cover) <span className="text-red-500">*</span>
+              Ảnh 1 (Gốc/Cover) <span className="text-red-500">*</span>
               <span className="text-xs font-normal text-gray-500 ml-2">
-                (Max 5MB)
+                (Tối đa 5MB)
               </span>
             </label>
             <input
@@ -108,9 +108,9 @@ function CompareTab() {
 
           <div className="card">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Image 2 (Stego/Recovered) <span className="text-red-500">*</span>
+              Ảnh 2 (Stego/Phục Hồi) <span className="text-red-500">*</span>
               <span className="text-xs font-normal text-gray-500 ml-2">
-                (Max 5MB)
+                (Tối đa 5MB)
               </span>
             </label>
             <input
@@ -140,12 +140,12 @@ function CompareTab() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faSpinner} spin />
-              Calculating...
+              Đang tính toán...
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
               <FontAwesomeIcon icon={faCalculator} />
-              Calculate Metrics
+              Tính Toán Chỉ Số
             </span>
           )}
         </button>
@@ -155,7 +155,7 @@ function CompareTab() {
         <div className="mt-8 text-center py-12 bg-primary-50 rounded-xl border-2 border-primary-200">
           <div className="spinner mx-auto mb-4"></div>
           <p className="text-primary-700 font-semibold text-lg">
-            Comparing images...
+            Đang so sánh ảnh...
           </p>
         </div>
       )}
@@ -168,7 +168,7 @@ function CompareTab() {
               className="text-2xl text-red-500 mr-3"
             />
             <div>
-              <strong className="text-red-800 font-semibold">Error:</strong>
+              <strong className="text-red-800 font-semibold">Lỗi:</strong>
               <p className="text-red-700 mt-1">{error}</p>
             </div>
           </div>
@@ -179,7 +179,7 @@ function CompareTab() {
         <div className="mt-8 space-y-6">
           <div className="card bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200 border-2">
             <h3 className="text-2xl font-bold text-gray-800 mb-6">
-              Image Quality Metrics
+              Chỉ Số Chất Lượng Ảnh
             </h3>
 
             <div className="grid md:grid-cols-3 gap-6 mb-6">
@@ -208,7 +208,7 @@ function CompareTab() {
                 <div className="text-4xl font-bold text-primary-600">
                   {result.mse.toFixed(2)}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">error</div>
+                <div className="text-sm text-gray-500 mt-1">lỗi</div>
               </div>
             </div>
 
@@ -218,7 +218,7 @@ function CompareTab() {
               } text-white rounded-xl p-4 text-center`}
             >
               <div className="text-2xl font-bold">
-                Quality: {getQualityBadge(result.psnr, result.ssim).text}
+                Chất Lượng: {getQualityBadge(result.psnr, result.ssim).text}
               </div>
             </div>
           </div>
@@ -226,36 +226,36 @@ function CompareTab() {
           <div className="card">
             <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <FontAwesomeIcon icon={faBook} />
-              Understanding the Metrics
+              Hiểu Về Các Chỉ Số
             </h4>
             <div className="space-y-4 text-sm text-gray-700">
               <div>
                 <strong className="text-primary-600">
-                  PSNR (Peak Signal-to-Noise Ratio):
+                  PSNR (Tỷ Lệ Tín Hiệu Đỉnh Trên Nhiễu):
                 </strong>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
-                  <li>&gt; 40 dB: Excellent quality - virtually identical</li>
-                  <li>30-40 dB: Good quality - minor differences</li>
-                  <li>&lt; 30 dB: Fair quality - noticeable differences</li>
+                  <li>&gt; 40 dB: Chất lượng xuất sắc - gần như giống hệt</li>
+                  <li>30-40 dB: Chất lượng tốt - khác biệt nhỏ</li>
+                  <li>&lt; 30 dB: Chất lượng khá - khác biệt đáng chú ý</li>
                 </ul>
               </div>
               <div>
                 <strong className="text-primary-600">
-                  SSIM (Structural Similarity Index):
+                  SSIM (Chỉ Số Tương Đồng Cấu Trúc):
                 </strong>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
-                  <li>&gt; 0.95: Very similar structures</li>
-                  <li>0.90-0.95: Similar structures</li>
-                  <li>&lt; 0.90: Moderate similarity</li>
+                  <li>&gt; 0.95: Cấu trúc rất tương đồng</li>
+                  <li>0.90-0.95: Cấu trúc tương đồng</li>
+                  <li>&lt; 0.90: Tương đồng trung bình</li>
                 </ul>
               </div>
               <div>
                 <strong className="text-primary-600">
-                  MSE (Mean Squared Error):
+                  MSE (Sai Số Bình Phương Trung Bình):
                 </strong>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
-                  <li>Lower values indicate better similarity</li>
-                  <li>0 means identical images</li>
+                  <li>Giá trị thấp hơn cho thấy độ tương đồng tốt hơn</li>
+                  <li>0 có nghĩa là các ảnh giống hệt nhau</li>
                 </ul>
               </div>
             </div>
