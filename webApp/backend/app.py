@@ -63,6 +63,7 @@ OUTPUT_FOLDER = 'outputs'
 KEYS_FOLDER = 'keys'
 MODEL_FOLDER = 'model'
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+MAX_CONTENT_LENGTH = 20 * 1024 * 1024  # 20MB for multiple file uploads
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # Find best model file
@@ -96,7 +97,7 @@ os.makedirs(KEYS_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['KEYS_FOLDER'] = KEYS_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
 
 def allowed_file(filename):
@@ -210,6 +211,12 @@ def encode():
         cover_filename = f"{unique_id}_cover.png"
         cover_path = os.path.join(app.config['UPLOAD_FOLDER'], cover_filename)
         cover_file.save(cover_path)
+        
+        # Check file size
+        cover_size = os.path.getsize(cover_path)
+        if cover_size > MAX_FILE_SIZE:
+            os.remove(cover_path)
+            return jsonify({'error': f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit'}), 400
         
         logger.info(f"[ENCODE] Request ID: {unique_id}")
         logger.info(f"[ENCODE] Saved cover image: {cover_path}")
@@ -343,6 +350,12 @@ def decode():
             
             try:
                 download_image_from_url(stego_url, stego_path)
+                
+                # Check file size
+                stego_size = os.path.getsize(stego_path)
+                if stego_size > MAX_FILE_SIZE:
+                    os.remove(stego_path)
+                    return jsonify({'error': f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit'}), 400
             except Exception as e:
                 return jsonify({'error': f'Failed to download image from URL: {str(e)}'}), 400
         
@@ -359,6 +372,12 @@ def decode():
             stego_filename = f"{unique_id}_stego.png"
             stego_path = os.path.join(app.config['UPLOAD_FOLDER'], stego_filename)
             stego_file.save(stego_path)
+            
+            # Check file size
+            stego_size = os.path.getsize(stego_path)
+            if stego_size > MAX_FILE_SIZE:
+                os.remove(stego_path)
+                return jsonify({'error': f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit'}), 400
         
         else:
             return jsonify({'error': 'No stego image or URL provided'}), 400
@@ -462,16 +481,36 @@ def reverse():
         stego_path = os.path.join(app.config['UPLOAD_FOLDER'], stego_filename)
         stego_file.save(stego_path)
         
+        # Check file size
+        stego_size = os.path.getsize(stego_path)
+        if stego_size > MAX_FILE_SIZE:
+            os.remove(stego_path)
+            return jsonify({'error': f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit'}), 400
+        
         # Reverse to recover cover
         recovered_filename = f"{unique_id}_recovered.png"
         recovered_path = os.path.join(app.config['OUTPUT_FOLDER'], recovered_filename)
         
-        logger.info(f"[REVERSE] Using model: {BEST_MODEL_PATH or 'random weights'}")
-        reverse_hiding(
-            stego_image_path=stego_path,
-            output_path=recovered_path,
-            model_path=BEST_MODEL_PATH
-        )
+        # Check if model exists and has reverse decoder weights
+        if not BEST_MODEL_PATH:
+            return jsonify({'error': 'No trained model available. Reverse hiding requires a trained model.'}), 500
+        
+        logger.info(f"[REVERSE] Using model: {BEST_MODEL_PATH}")
+        
+        try:
+            reverse_hiding(
+                stego_image_path=stego_path,
+                output_path=recovered_path,
+                model_path=BEST_MODEL_PATH
+            )
+        except ValueError as ve:
+            # Handle missing reverse decoder weights
+            logger.error(f"[REVERSE] Model validation failed: {ve}")
+            return jsonify({'error': str(ve)}), 400
+        except Exception as reverse_error:
+            logger.error(f"[REVERSE] reverse_hiding() failed: {reverse_error}")
+            logger.error(traceback.format_exc())
+            raise
         
         # Cleanup
         cleanup_old_files(app.config['UPLOAD_FOLDER'])
@@ -538,6 +577,14 @@ def compare():
         
         img1_file.save(img1_path)
         img2_file.save(img2_path)
+        
+        # Check file sizes
+        img1_size = os.path.getsize(img1_path)
+        img2_size = os.path.getsize(img2_path)
+        if img1_size > MAX_FILE_SIZE or img2_size > MAX_FILE_SIZE:
+            os.remove(img1_path)
+            os.remove(img2_path)
+            return jsonify({'error': f'File size exceeds {MAX_FILE_SIZE // (1024*1024)}MB limit'}), 400
         
         # Load images
         img1 = np.array(Image.open(img1_path).convert('RGB'))

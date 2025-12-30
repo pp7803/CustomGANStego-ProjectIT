@@ -411,11 +411,10 @@ def reverse_hiding(stego_image_path, output_path, model_path=None):
             reverse_decoder.load_state_dict(checkpoint['state_dict_reverse_decoder'])
             print("✓ Loaded pretrained reverse decoder")
         else:
-            print("⚠️  Warning: No reverse_decoder weights found in checkpoint")
-            print("   Using randomly initialized weights (will not work well)")
+            raise ValueError("Reverse decoder weights not found in model checkpoint. "
+                           "The model was not trained with reverse hiding capability.")
     else:
-        print("⚠️  Warning: No model path provided")
-        print("   Using randomly initialized weights (will not work well)")
+        raise ValueError("No model path provided. Reverse hiding requires a trained model.")
     
     reverse_decoder.eval()
     
