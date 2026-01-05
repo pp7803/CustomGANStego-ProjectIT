@@ -1,66 +1,88 @@
 # CustomGANStego Web API
 
-RESTful API for GAN-based steganography operations. Hide messages in images, extract hidden messages, and perform image analysis.
+RESTful API cho các thao tác steganography dựa trên GAN. Giấu tin trong ảnh, trích xuất tin ẩn và phân tích ảnh.
 
-## Features
+## Tính năng
 
-- **Encode**: Hide secret messages in images using GAN
-- **Decode**: Extract hidden messages from stego images
-- **Reverse**: Recover original cover image (lossless)
-- **Compare**: Calculate PSNR/SSIM/MSE metrics between images
-- **GenRSA**: Generate RSA key pairs for encryption
-- **Encryption**: Optional RSA+AES hybrid encryption for messages
+- **Encode**: Giấu tin bí mật vào ảnh sử dụng GAN
+- **Decode**: Trích xuất tin ẩn từ ảnh stego
+- **Reverse**: Khôi phục ảnh cover gốc (lossless)
+- **Compare**: Tính toán metrics PSNR/SSIM/MSE giữa các ảnh
+- **GenRSA**: Tạo cặp khóa RSA cho mã hóa
+- **Encryption**: Mã hóa lai RSA+AES tùy chọn cho tin nhắn
 
-## Project Structure
+## Cấu trúc dự án
 
 ```
 webApp/
 ├── backend/
 │   ├── app.py                 # Flask API server
-│   ├── encoder.py             # Encoder neural network
-│   ├── decoder.py             # Decoder neural network
-│   ├── critic.py              # Critic network
+│   ├── encoder.py             # Mạng nơ-ron Encoder
+│   ├── decoder.py             # Mạng nơ-ron Decoder
+│   ├── critic.py              # Mạng Critic
 │   ├── reverse_decoder.py     # Reverse decoder
-│   ├── enhancedstegan.py      # Core steganography functions
-│   ├── requirements.txt       # Python dependencies
-│   ├── setup.sh               # Setup script
-│   ├── venv/                  # Virtual environment (auto-created)
-│   ├── results/               # Model files
-│   ├── uploads/               # Temporary uploads
-│   ├── outputs/               # Generated outputs
-│   └── keys/                  # Generated RSA keys
-└── README.md
+│   ├── enhancedstegan.py      # Hàm steganography cốt lõi
+│   ├── requirements.txt       # Dependencies Python
+│   ├── setup.sh               # Script thiết lập
+│   ├── venv/                  # Môi trường ảo (tự động tạo)
+│   ├── model/                 # File model
+│   ├── uploads/               # Upload tạm thời
+│   ├── outputs/               # Đầu ra được tạo
+│   └── keys/                  # Khóa RSA được tạo
+└── frontend/
+    ├── src/                   # React source code
+    ├── package.json           # Node dependencies
+    └── vite.config.js         # Vite config
 ```
 
-## Quick Start
+## Khởi động nhanh
 
-### 1. Setup
+### 1. Thiết lập Backend
 
 ```bash
 cd webApp/backend
 ./setup.sh
 ```
 
-This will:
+Script này sẽ:
 
-- Create a Python virtual environment
-- Install all dependencies
-- Prepare the API server
+- Tạo môi trường ảo Python
+- Cài đặt tất cả dependencies
+- Chuẩn bị API server
 
-### 2. Run Development Server
+### 2. Chạy Development Server (Backend)
 
 ```bash
 source venv/bin/activate
 python app.py
 ```
 
-Server runs at: `http://localhost:5000`
+Server chạy tại: `http://localhost:3012`
 
-### 3. Run Production Server
+### 3. Thiết lập và chạy Frontend
+
+```bash
+cd webApp/frontend
+npm install
+npm run dev
+```
+
+Frontend chạy tại: `http://localhost:5000`
+
+### 4. Chạy Production Server
+
+**Backend:**
 
 ```bash
 source venv/bin/activate
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+gunicorn -w 4 -b 127.0.0.1:3012 --timeout 600 app:app
+```
+
+**Frontend:**
+
+```bash
+npm run build
+npm run preview
 ```
 
 ## API Endpoints
@@ -77,50 +99,52 @@ Response:
 {
   "status": "healthy",
   "service": "CustomGANStego API",
-  "crypto_available": true
+  "crypto_available": true,
+  "python_version": "3.11.x",
+  "torch_version": "2.x.x"
 }
 ```
 
-### Encode (Hide Message)
+### Encode (Giấu tin)
 
 ```http
 POST /encode
 Content-Type: multipart/form-data
 
-cover_image: [file]
-message: "Secret message"
-use_encryption: true (optional)
-public_key: [file] (if use_encryption=true)
-return_url: true (optional, default=true)
+cover_image: [file]              # Ảnh cover
+message: "Tin bí mật"            # Tin cần giấu
+use_encryption: true             # Tùy chọn mã hóa
+public_key: [file]               # Nếu use_encryption=true
+return_url: true                 # Tùy chọn, mặc định=true
 ```
 
-Response (when return_url=true):
+Response (khi return_url=true):
 
 ```json
 {
   "success": true,
-  "stego_url": "http://localhost:5000/files/uuid_stego.png",
+  "stego_url": "http://localhost:3012/files/uuid_stego.png",
   "filename": "uuid_stego.png"
 }
 ```
 
-Response (when return_url=false): PNG image file (direct download)
+Response (khi return_url=false): File ảnh PNG (tải trực tiếp)
 
-### Decode (Extract Message)
+### Decode (Trích xuất tin)
 
 ```http
 POST /decode
 Content-Type: multipart/form-data
 
-Method 1 - Upload file:
-stego_image: [file]
-use_decryption: true (optional)
-private_key: [file] (if use_decryption=true)
+Phương pháp 1 - Upload file:
+stego_image: [file]              # Ảnh stego
+use_decryption: true             # Tùy chọn giải mã
+private_key: [file]              # Nếu use_decryption=true
 
-Method 2 - Use URL:
+Phương pháp 2 - Dùng URL:
 stego_url: "http://example.com/image.png"
-use_decryption: true (optional)
-private_key: [file] (if use_decryption=true)
+use_decryption: true
+private_key: [file]
 ```
 
 Response:
@@ -128,11 +152,11 @@ Response:
 ```json
 {
   "success": true,
-  "message": "Secret message"
+  "message": "Tin bí mật"
 }
 ```
 
-### Reverse (Recover Original)
+### Reverse (Khôi phục ảnh gốc)
 
 ```http
 POST /reverse
@@ -141,9 +165,9 @@ Content-Type: multipart/form-data
 stego_image: [file]
 ```
 
-Response: PNG image file (recovered cover)
+Response: File ảnh PNG (ảnh cover đã khôi phục)
 
-### Compare (Calculate Metrics)
+### Compare (Tính metrics)
 
 ```http
 POST /compare
@@ -166,76 +190,49 @@ Response:
 }
 ```
 
-### Generate RSA Keys
+### Tạo khóa RSA
 
 ```http
 POST /genrsa
 Content-Type: multipart/form-data
 
-key_size: 2048
+key_size: 2048                   # 1024, 2048, 3072, hoặc 4096
 ```
 
-Response: ZIP file containing `private_key.pem` and `public_key.pem`
+Response: File ZIP chứa `private_key.pem` và `public_key.pem`
 
-### Serve Files
+### Truy xuất file
 
 ```http
 GET /files/<filename>
 ```
 
-Returns the image file from server outputs folder.
+Trả về file ảnh từ thư mục outputs của server.
 
-## Example Usage
+## Ví dụ sử dụng
 
-### Using cURL
+### Sử dụng cURL
 
-**Encode (return URL):**
+**Encode (trả về URL):**
 
 ```bash
-curl -X POST http://localhost:5000/encode \
+curl -X POST http://localhost:3012/encode \
   -F "cover_image=@cover.png" \
-  -F "message=Hello World" \
+  -F "message=Xin chào" \
   -F "return_url=true"
 ```
 
-Response:
-
-```json
-{
-  "success": true,
-  "stego_url": "http://localhost:5000/files/abc123_stego.png",
-  "filename": "abc123_stego.png"
-}
-```
-
-**Encode (download file):**
+**Decode từ URL:**
 
 ```bash
-curl -X POST http://localhost:5000/encode \
-  -F "cover_image=@cover.png" \
-  -F "message=Hello World" \
-  -F "return_url=false" \
-  -o stego.png
-```
-
-**Decode from uploaded file:**
-
-```bash
-curl -X POST http://localhost:5000/decode \
-  -F "stego_image=@stego.png"
-```
-
-**Decode from URL:**
-
-```bash
-curl -X POST http://localhost:5000/decode \
-  -F "stego_url=http://example.com/stego.png"
+curl -X POST http://localhost:3012/decode \
+  -F "stego_url=http://localhost:3012/files/abc123_stego.png"
 ```
 
 **Reverse:**
 
 ```bash
-curl -X POST http://localhost:5000/reverse \
+curl -X POST http://localhost:3012/reverse \
   -F "stego_image=@stego.png" \
   -o recovered.png
 ```
@@ -243,210 +240,157 @@ curl -X POST http://localhost:5000/reverse \
 **Compare:**
 
 ```bash
-curl -X POST http://localhost:5000/compare \
+curl -X POST http://localhost:3012/compare \
   -F "image1=@cover.png" \
   -F "image2=@stego.png"
 ```
 
-**Generate RSA Keys:**
+**Tạo khóa RSA:**
 
 ```bash
-curl -X POST http://localhost:5000/genrsa \
+curl -X POST http://localhost:3012/genrsa \
   -F "key_size=2048" \
   -o keys.zip
 ```
 
-**Get file from server:**
-
-```bash
-curl http://localhost:5000/files/abc123_stego.png -o downloaded.png
-```
-
-### Using Python
+### Sử dụng Python
 
 ```python
 import requests
 
-# Encode - get URL
+# Encode - nhận URL
 with open('cover.png', 'rb') as f:
     response = requests.post(
-        'http://localhost:5000/encode',
+        'http://localhost:3012/encode',
         files={'cover_image': f},
-        data={
-            'message': 'Secret message',
-            'return_url': 'true'
-        }
+        data={'message': 'Tin bí mật', 'return_url': 'true'}
     )
     result = response.json()
     stego_url = result['stego_url']
-    print(f"Stego image URL: {stego_url}")
 
-# Encode - download file
-with open('cover.png', 'rb') as f:
-    response = requests.post(
-        'http://localhost:5000/encode',
-        files={'cover_image': f},
-        data={
-            'message': 'Secret message',
-            'return_url': 'false'
-        }
-    )
-    with open('stego.png', 'wb') as out:
-        out.write(response.content)
-
-# Decode from file
-with open('stego.png', 'rb') as f:
-    response = requests.post(
-        'http://localhost:5000/decode',
-        files={'stego_image': f}
-    )
-    print(response.json()['message'])
-
-# Decode from URL
+# Decode từ URL
 response = requests.post(
-    'http://localhost:5000/decode',
-    data={'stego_url': 'http://example.com/stego.png'}
+    'http://localhost:3012/decode',
+    data={'stego_url': stego_url}
 )
 print(response.json()['message'])
 ```
 
-## Configuration
+### Sử dụng JavaScript/React
 
-Edit `app.py` to configure:
+```javascript
+import { encodeImage, decodeImage } from "./api";
 
-```python
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+// Encode
+const result = await encodeImage(coverFile, message, false);
+console.log("Stego URL:", result.stego_url);
+
+// Decode từ URL
+const decoded = await decodeImage(null, stegoUrl, false);
+console.log("Tin đã giải mã:", decoded.message);
 ```
 
-## Requirements
+## Cấu hình
+
+Chỉnh sửa `app.py`:
+
+```python
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+# Port configuration
+app.run(host='0.0.0.0', port=3012, debug=True)
+```
+
+## Yêu cầu hệ thống
 
 - Python 3.8+
-- 4GB RAM minimum (8GB recommended)
-- CUDA GPU (optional, for faster processing)
+- Node.js 16+ (cho frontend)
+- 4GB RAM tối thiểu (8GB khuyến nghị)
+- CUDA GPU (tùy chọn)
 
 ## Dependencies
 
-Core:
+**Backend:** Flask, PyTorch, Pillow, scikit-image, pycryptodome, gunicorn
 
-- Flask 2.3+
-- PyTorch 2.0+
-- Pillow 9.0+
-- scikit-image 0.20+
-- pycryptodome 3.17+
+**Frontend:** React, Vite, Axios, Tailwind CSS
 
-See `requirements.txt` for complete list.
+Xem `backend/requirements.txt` và `frontend/package.json`.
 
-## Security Notes
+## Lưu ý bảo mật
 
-1. **File Uploads**: Files are auto-deleted after 24 hours
-2. **Encryption**: Use RSA+AES for sensitive messages
-3. **API Keys**: Add authentication for production use
-4. **HTTPS**: Use reverse proxy (nginx) with SSL in production
+1. **Upload file**: Tự động xóa sau 24 giờ
+2. **Mã hóa**: Dùng RSA+AES cho tin nhạy cảm
+3. **HTTPS**: Dùng reverse proxy với SSL trong production
+4. **CORS**: Đã cấu hình, điều chỉnh cho domain cụ thể
 
-## Production Deployment
+## Triển khai Production
 
-### Using Nginx
+### Nginx + Gunicorn
 
-1. Install nginx and configure reverse proxy:
+**Backend:**
+
+```bash
+gunicorn -w 4 -b 127.0.0.1:3012 --timeout 600 app:app
+```
+
+**Nginx config:**
 
 ```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-
-    location / {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
+location /api {
+    proxy_pass http://127.0.0.1:3012;
+    proxy_read_timeout 600s;
 }
 ```
 
-2. Run with gunicorn:
+**Frontend:**
 
 ```bash
-gunicorn -w 4 -b 127.0.0.1:5000 app:app
+npm run build
+# Serve dist/ với nginx
 ```
 
-### Using Docker
-
-Create `Dockerfile`:
-
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
-```
-
-Build and run:
+### Docker
 
 ```bash
-docker build -t customganstego-api .
-docker run -p 5000:5000 customganstego-api
+docker-compose up -d
 ```
 
-## Troubleshooting
+## Khắc phục sự cố
 
-**Import Error:**
+**Model không tìm thấy:**
 
 ```bash
-# Make sure venv is activated
-source venv/bin/activate
-
-# Reinstall dependencies
-pip install -r requirements.txt
+cp ../results/model/*.dat backend/model/
 ```
 
-**Model Not Found:**
+**Port đã dùng:**
 
 ```bash
-# Ensure results/model/ exists with .dat files
-ls -la results/model/
+lsof -i :3012
+kill -9 <PID>
 ```
 
-**Port Already in Use:**
+**Decode từ URL timeout:**
 
-```bash
-# Change port in app.py or use environment variable
-export FLASK_RUN_PORT=5001
-python app.py
-```
+- Đã fix: Server detect localhost và đọc file local
+- Hoặc dùng nhiều worker: `gunicorn -w 4`
 
-## Performance
+## Hiệu năng
 
-- **Encode**: ~2-5 seconds per image
-- **Decode**: ~1-3 seconds per image
-- **Reverse**: ~2-4 seconds per image
-- **Compare**: < 1 second
-
-_Times vary based on image size and hardware_
-
-## API Rate Limiting
-
-For production, add rate limiting:
-
-```python
-from flask_limiter import Limiter
-
-limiter = Limiter(app, key_func=get_remote_address)
-
-@app.route('/encode', methods=['POST'])
-@limiter.limit("10 per minute")
-def encode():
-    ...
-```
+- Encode: ~2-5s/ảnh
+- Decode: ~1-3s/ảnh
+- Reverse: ~2-4s/ảnh
+- Compare: <1s
 
 ## License
 
-MIT License - See LICENSE in project root
+MIT License - Xem LICENSE trong thư mục gốc
 
-## Support
+## Hỗ trợ
 
-For issues and questions, see main project README or create an issue on GitHub.
+Chi tiết API: `backend/API_EXAMPLES.txt`
+
+---
+
+**CustomGANStego Web API** - Steganography as a Service 🔒🖼️
