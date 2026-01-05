@@ -291,7 +291,11 @@ def encode_message(cover_image_path, secret_text, output_path, model_path=None):
         generated = encoder.forward(cover, payload)[0].clamp(-1.0, 1.0)
     
     generated = (generated.permute(2, 1, 0).detach().cpu().numpy() + 1.0) * 127.5
-    imwrite(output_path, generated.astype('uint8'))
+    generated_img = generated.astype('uint8')
+    
+    # Sử dụng PIL để lưu ảnh (tương thích tốt hơn với Windows)
+    img = Image.fromarray(generated_img)
+    img.save(output_path)
     
     print(f"Đã mã hóa message vào: {output_path}")
     print(f"Văn bản bí mật: {secret_text}")
@@ -360,7 +364,11 @@ def reverse_hiding(stego_image_path, output_path, model_path=None):
         recovered_cover = reverse_decoder(stego)[0].clamp(-1.0, 1.0)
     
     recovered_cover = (recovered_cover.permute(2, 1, 0).detach().cpu().numpy() + 1.0) * 127.5
-    imwrite(output_path, recovered_cover.astype('uint8'))
+    recovered_cover_img = recovered_cover.astype('uint8')
+    
+    # Sử dụng PIL để lưu ảnh (tương thích tốt hơn với Windows)
+    img = Image.fromarray(recovered_cover_img)
+    img.save(output_path)
     
     print(f"Đã khôi phục ảnh cover và lưu vào: {output_path}")
     
