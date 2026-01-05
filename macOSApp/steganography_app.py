@@ -102,8 +102,14 @@ class SteganographyApp:
         self.root.title("GAN Steganography - CustomGANStego")
         self.root.geometry("1200x800")
         
+        # Set theme based on OS
         style = ttk.Style()
-        style.theme_use('aqua')
+        if sys.platform == 'darwin':  # macOS
+            style.theme_use('aqua')
+        elif sys.platform == 'win32':  # Windows
+            style.theme_use('vista')
+        else:  # Linux and others
+            style.theme_use('clam')
         
         self.model_path = find_best_model()
         if self.model_path:
