@@ -120,8 +120,25 @@ def cleanup_old_files(folder, max_age_hours=24):
 
 
 def download_image_from_url(url, save_path):
-    """Download image from URL"""
+    """Download image from URL or copy from local filesystem"""
     try:
+        # Parse URL to check if it's localhost
+        parsed = urlparse(url)
+        is_localhost = parsed.hostname in ['localhost', '127.0.0.1', '::1']
+        
+        # If localhost, try to read file directly from OUTPUT_FOLDER to avoid deadlock
+        if is_localhost and parsed.path.startswith('/files/'):
+            filename = parsed.path.split('/')[-1]
+            local_path = os.path.join(OUTPUT_FOLDER, filename)
+            
+            if os.path.exists(local_path):
+                logger.info(f"[DOWNLOAD] Using local file instead of HTTP: {local_path}")
+                shutil.copy(local_path, save_path)
+                return True
+            else:
+                logger.warning(f"[DOWNLOAD] Local file not found: {local_path}, falling back to HTTP")
+        
+        # Download from URL
         response = requests.get(url, timeout=30)
         response.raise_for_status()
         

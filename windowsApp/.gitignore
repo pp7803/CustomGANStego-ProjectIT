@@ -3,6 +3,7 @@ venv/
 
 # PyInstaller build files
 build/
+temp_build/
 dist/
 *.spec
 *.spec.bak

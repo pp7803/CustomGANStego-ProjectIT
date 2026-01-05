@@ -202,8 +202,22 @@ if exist "CustomGANStego.spec" (
 echo Don dep hoan tat
 echo.
 
+REM Copy dependencies to local to avoid network path issues
+echo Sao chep cac file can thiet vao local...
+if not exist "%SCRIPT_DIR%temp_build" mkdir "%SCRIPT_DIR%temp_build"
+copy /Y "%PROJECT_DIR%\encoder.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
+copy /Y "%PROJECT_DIR%\decoder.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
+copy /Y "%PROJECT_DIR%\critic.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
+copy /Y "%PROJECT_DIR%\reverse_decoder.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
+copy /Y "%PROJECT_DIR%\enhancedstegan.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
+echo [OK] Da sao chep dependencies
+echo.
+
 echo Dang chay PyInstaller...
-python -m PyInstaller --clean --name=CustomGANStego --windowed --onefile --add-data "%PROJECT_DIR%\results\model;results\model" --add-data "%PROJECT_DIR%\encoder.py;." --add-data "%PROJECT_DIR%\decoder.py;." --add-data "%PROJECT_DIR%\critic.py;." --add-data "%PROJECT_DIR%\reverse_decoder.py;." --add-data "%PROJECT_DIR%\enhancedstegan.py;." --hidden-import torch --hidden-import torchvision --hidden-import PIL --hidden-import numpy --hidden-import skimage --hidden-import Crypto --hidden-import imageio --hidden-import imageio.core --hidden-import imageio.plugins --hidden-import reedsolo --hidden-import matplotlib --hidden-import psutil --collect-all torch --collect-all torchvision --collect-all imageio steganography_app.py
+python -m PyInstaller --clean --name=CustomGANStego --windowed --onefile --add-data "%PROJECT_DIR%\results\model;results\model" --add-data "%SCRIPT_DIR%temp_build\encoder.py;." --add-data "%SCRIPT_DIR%temp_build\decoder.py;." --add-data "%SCRIPT_DIR%temp_build\critic.py;." --add-data "%SCRIPT_DIR%temp_build\reverse_decoder.py;." --add-data "%SCRIPT_DIR%temp_build\enhancedstegan.py;." --hidden-import torch --hidden-import torchvision --hidden-import PIL --hidden-import numpy --hidden-import skimage --hidden-import Crypto --hidden-import imageio --hidden-import imageio.core --hidden-import imageio.plugins --hidden-import reedsolo --hidden-import matplotlib --hidden-import psutil --collect-all torch --collect-all torchvision --collect-all imageio steganography_app.py
+
+REM Cleanup temp files
+if exist "%SCRIPT_DIR%temp_build" rmdir /s /q "%SCRIPT_DIR%temp_build" >nul 2>&1
 
 if errorlevel 1 (
     echo.
