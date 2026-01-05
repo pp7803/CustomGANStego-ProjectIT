@@ -4,6 +4,8 @@ const API_BASE_URL = import.meta.env.PROD
   ? "https://apistegan.ppdeveloper.xyz"
   : "/api";
 
+// const API_BASE_URL = import.meta.env.PROD ? "http://localhost:3012" : "/api";
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 300000, // 5 minutes for large files

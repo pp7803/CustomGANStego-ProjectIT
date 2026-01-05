@@ -13,25 +13,35 @@
 
 ## Quick Start
 
-### One-Command Build
+### One-Command Build (Khuyến nghị)
 
 ```cmd
 cd windowsApp
 build_app.bat
 ```
 
+Script `build_app.bat` tích hợp tất cả chức năng:
+
+1.  **Tự động kiểm tra Python** - Yêu cầu Python 3.8+
+2.  **Tự động tạo venv riêng** - Tạo `windowsApp\venv\` nếu chưa có
+3.  **Tự động cài dependencies** - Cài đặt tất cả packages từ requirements.txt
+4.  **Kiểm tra model files** - Kiểm tra model đã train
+5.  **Build executable** - Tạo CustomGANStego.exe với PyInstaller
+6.  **Hướng dẫn sử dụng** - Interactive guide
+
 **Output:**
 
 - `dist\CustomGANStego.exe` - Windows executable (~150-200 MB)
 
-Script sẽ tự động:
+### Setup Only (Không build)
 
-1.  Kiểm tra Python và dependencies
-2.  Tạo/activate virtual environment
-3.  Cài đặt packages thiếu
-4.  Kiểm tra model files
-5.  Build executable với PyInstaller
-6.  Hướng dẫn sử dụng
+Chỉ tạo và cài đặt môi trường ảo mà không build app:
+
+```cmd
+build_app.bat --setup-only
+REM hoặc
+build_app.bat -s
+```
 
 ### Run Application
 
@@ -51,7 +61,52 @@ dist\CustomGANStego.exe
 
 ```cmd
 cd windowsApp
+venv\Scripts\activate
 python steganography_app.py
+```
+
+## Virtual Environment (Môi trường ảo riêng)
+
+Windows App sử dụng **môi trường ảo riêng** tại `windowsApp\venv\`, hoàn toàn độc lập với `prjvenv\` của thư mục cha.
+
+### Tự động setup (được tích hợp trong build_app.bat)
+
+Script `build_app.bat` sẽ tự động:
+
+- Tạo `venv\` nếu chưa tồn tại
+- Kiểm tra và sửa chữa nếu venv bị hỏng
+- Cài đặt dependencies nếu thiếu
+
+**Không cần chạy script riêng!**
+
+### Manual setup (nếu cần)
+
+```cmd
+cd windowsApp
+
+REM Tạo venv
+python -m venv venv
+
+REM Kích hoạt
+venv\Scripts\activate
+
+REM Cài dependencies
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### Sử dụng môi trường
+
+```cmd
+REM Kích hoạt
+venv\Scripts\activate
+
+REM Kiểm tra
+where python
+REM Nên hiển thị: ...\windowsApp\venv\Scripts\python.exe
+
+REM Tắt
+deactivate
 ```
 
 ## Requirements
@@ -80,7 +135,9 @@ Dependencies chính:
 - pycryptodome>=3.17.0
 - pyinstaller>=5.10.0
 
-##  Build từ Source
+## Build từ Source (Nâng cao)
+
+> **Lưu ý**: Script `build_app.bat` đã tự động làm tất cả. Phần này chỉ dành cho debug.
 
 ### Bước 1: Setup môi trường
 
@@ -190,7 +247,7 @@ App có 5 tabs chính:
 - Vào tab **Encode Encode**
 - Click "Chọn ảnh..." → chọn ảnh cover
 - Nhập tin cần giấu
--  Check "Sử dụng mã hóa RSA+AES"
+- Check "Sử dụng mã hóa RSA+AES"
 - Click "Chọn public key..." → chọn `public_key.pem`
 - Click "Encode Encode"
 - Lưu ảnh stego
@@ -199,7 +256,7 @@ App có 5 tabs chính:
 
 - Vào tab **Decode Decode**
 - Click "Chọn ảnh..." → chọn ảnh stego
--  Check "Giải mã RSA+AES"
+- Check "Giải mã RSA+AES"
 - Click "Chọn private key..." → chọn `private_key.pem`
 - Click "Decode Decode"
 - Tin sẽ hiển thị trong textbox

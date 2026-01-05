@@ -1,0 +1,23 @@
+# Virtual Environment
+venv/
+
+# PyInstaller build files
+build/
+dist/
+*.spec
+*.spec.bak
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Windows
+Thumbs.db
+*.exe
+*.zip
+
+# Temporary files
+*.log
+*.tmp

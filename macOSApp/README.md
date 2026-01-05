@@ -13,7 +13,7 @@
 
 ## Quick Start
 
-### One-Command Build
+### One-Command Build (Khuyến nghị)
 
 ```bash
 cd macOSApp
@@ -21,20 +21,31 @@ chmod +x build_app.sh
 ./build_app.sh
 ```
 
+Script `build_app.sh` tích hợp tất cả chức năng:
+
+1.  **Tự động kiểm tra Python** - Yêu cầu Python 3.8+
+2.  **Tự động tạo venv riêng** - Tạo `macOSApp/venv/` nếu chưa có
+3.  **Tự động cài dependencies** - Cài đặt tất cả packages từ requirements.txt
+4.  **Kiểm tra model files** - Kiểm tra model đã train
+5.  **Build app bundle** - Tạo CustomGANStego.app
+6.  **Tạo DMG/ZIP installer** - Lựa chọn định dạng phân phối
+7.  **Hướng dẫn cài đặt** - Interactive guide
+
 **Output:**
 
 - `dist/CustomGANStego.app` - macOS app bundle
-- `dist/CustomGANStego-macOS.dmg` - DMG installer (171 MB)
+- `dist/CustomGANStego-macOS.dmg` - DMG installer
+- `dist/CustomGANStego-macOS.zip` - ZIP archive
 
-Script sẽ tự động:
+### Setup Only (Không build)
 
-1.  Kiểm tra Python và dependencies
-2.  Tạo/activate virtual environment
-3.  Cài đặt packages thiếu
-4.  Kiểm tra model files
-5.  Build app bundle
-6.  Tạo DMG installer
-7.  Hướng dẫn sử dụng
+Chỉ tạo và cài đặt môi trường ảo mà không build app:
+
+```bash
+./build_app.sh --setup-only
+# hoặc
+./build_app.sh -s
+```
 
 ### Install from DMG (Recommended)
 
@@ -52,11 +63,55 @@ open dist/CustomGANStego-macOS.dmg
 open dist/CustomGANStego.app
 ```
 
+## Virtual Environment (Môi trường ảo riêng)
+
+macOS App sử dụng **môi trường ảo riêng** tại `macOSApp/venv/`, hoàn toàn độc lập với `prjvenv/` của thư mục cha.
+
+### Tự động setup (được tích hợp trong build_app.sh)
+
+Script `build_app.sh` sẽ tự động:
+
+- Tạo `venv/` nếu chưa tồn tại
+- Kiểm tra và sửa chữa nếu venv bị hỏng
+- Cài đặt dependencies nếu thiếu
+
+**Không cần chạy script riêng!**
+
+### Manual setup (nếu cần)
+
+```bash
+cd macOSApp
+
+# Tạo venv
+python3 -m venv venv
+
+# Kích hoạt
+source venv/bin/activate
+
+# Cài dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### Sử dụng môi trường
+
+```bash
+# Kích hoạt
+source venv/bin/activate
+
+# Kiểm tra
+which python3
+# Nên hiển thị: .../macOSApp/venv/bin/python3
+
+# Tắt
+deactivate
+```
+
 ### Development Mode
 
 ```bash
 cd macOSApp
-source ../prjvenv/bin/activate
+source venv/bin/activate
 python steganography_app.py
 ```
 
@@ -77,7 +132,7 @@ pyinstaller>=5.10.0
 
 Auto-installed by `build_app.sh`
 
-##  Usage Guide
+## Usage Guide
 
 ### 1. Encode (Giấu tin)
 
@@ -119,7 +174,7 @@ Auto-installed by `build_app.sh`
 4. Xem PSNR/SSIM/MSE
 5. (Optional) Lưu comparison image
 
-##  Workflow Examples
+## Workflow Examples
 
 ### Basic Steganography
 
@@ -174,7 +229,7 @@ python train.py  # Train models first
 pip install -r requirements.txt
 ```
 
-##  Structure
+## Structure
 
 ```
 macOSApp/
@@ -290,7 +345,7 @@ reedsolo>=1.7.0           # Error correction
 pyinstaller>=5.10.0       # Build tool
 ```
 
-##  Hướng dẫn sử dụng chi tiết
+## Hướng dẫn sử dụng chi tiết
 
 ### 1. Encode - Giấu tin vào ảnh
 
@@ -306,7 +361,7 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 3:** (Tùy chọn) Bật mã hóa
 
-- Check  "Sử dụng mã hóa RSA+AES"
+- Check "Sử dụng mã hóa RSA+AES"
 - Chọn public key (.pem file)
 
 **Bước 4:** Encode
@@ -328,7 +383,7 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 2:** (Nếu có mã hóa) Giải mã
 
-- Check  "Giải mã RSA+AES"
+- Check "Giải mã RSA+AES"
 - Chọn private key (.pem file)
 
 **Bước 3:** Decode
@@ -371,10 +426,10 @@ pyinstaller>=5.10.0       # Build tool
 
 **Bước 1:** Chọn độ dài khóa
 
--  1024 bits - Nhanh, bảo mật thấp
--  2048 bits -  Khuyến nghị (default)
--  3072 bits - Bảo mật cao
--  4096 bits - Bảo mật rất cao, chậm hơn
+- 1024 bits - Nhanh, bảo mật thấp
+- 2048 bits - Khuyến nghị (default)
+- 3072 bits - Bảo mật cao
+- 4096 bits - Bảo mật rất cao, chậm hơn
 
 **Bước 2:** Chọn thư mục lưu
 
@@ -410,13 +465,13 @@ pyinstaller>=5.10.0       # Build tool
 **Metrics:**
 
 - **PSNR** (Peak Signal-to-Noise Ratio)
-  - > 40 dB:  Chất lượng rất tốt
-  - > 30 dB:  Chất lượng tốt
-  - < 30 dB:  Chất lượng trung bình
+  - > 40 dB: Chất lượng rất tốt
+  - > 30 dB: Chất lượng tốt
+  - < 30 dB: Chất lượng trung bình
 - **SSIM** (Structural Similarity Index)
-  - > 0.95:  Tương đồng rất cao
-  - > 0.90:  Tương đồng cao
-  - < 0.90:  Tương đồng trung bình
+  - > 0.95: Tương đồng rất cao
+  - > 0.90: Tương đồng cao
+  - < 0.90: Tương đồng trung bình
 - **MSE** (Mean Squared Error)
   - Càng nhỏ càng tốt
 
@@ -432,7 +487,7 @@ pyinstaller>=5.10.0       # Build tool
 
 ---
 
-##  Workflow điển hình
+## Workflow điển hình
 
 ### Scenario 1: Giấu tin đơn giản (không mã hóa)
 
@@ -533,7 +588,7 @@ open dist/CustomGANStego.app
 
 ---
 
-##  Cấu trúc thư mục
+## Cấu trúc thư mục
 
 ```
 macOSApp/
@@ -576,24 +631,24 @@ Alice                          Bob
 
 ## So sánh với các phương pháp khác
 
-| Phương pháp        | PSNR   | SSIM  | Dung lượng | Tốc độ     | Reverse  |
-| ------------------ | ------ | ----- | ---------- | ---------- | -------- |
-| **CustomGANStego** | 40+ dB | 0.99+ | Cao        | Nhanh      |  Có    |
-| LSB                | 50+ dB | 0.99+ | Thấp       | Rất nhanh  |  Không |
-| DCT-based          | 40+ dB | 0.95+ | Trung bình | Trung bình |  Không |
-| DWT-based          | 35+ dB | 0.93+ | Trung bình | Chậm       |  Không |
+| Phương pháp        | PSNR   | SSIM  | Dung lượng | Tốc độ     | Reverse |
+| ------------------ | ------ | ----- | ---------- | ---------- | ------- |
+| **CustomGANStego** | 40+ dB | 0.99+ | Cao        | Nhanh      | Có      |
+| LSB                | 50+ dB | 0.99+ | Thấp       | Rất nhanh  | Không   |
+| DCT-based          | 40+ dB | 0.95+ | Trung bình | Trung bình | Không   |
+| DWT-based          | 35+ dB | 0.93+ | Trung bình | Chậm       | Không   |
 
 **Ưu điểm CustomGANStego:**
 
--  Khả năng reverse (khôi phục ảnh gốc)
--  PSNR cao (>45 dB)
--  SSIM rất cao (>0.99)
--  Chống steganalysis tốt nhờ GAN
--  Tích hợp mã hóa RSA+AES
+- Khả năng reverse (khôi phục ảnh gốc)
+- PSNR cao (>45 dB)
+- SSIM rất cao (>0.99)
+- Chống steganalysis tốt nhờ GAN
+- Tích hợp mã hóa RSA+AES
 
 ---
 
-##  Tài liệu tham khảo
+## Tài liệu tham khảo
 
 - **Paper:** "Hiding Images in Plain Sight: Deep Steganography" (Baluja, 2017)
 - **GAN:** "Generative Adversarial Networks" (Goodfellow et al., 2014)
@@ -630,7 +685,7 @@ Project CustomGANStego - CNTT
 
 ---
 
-##  Credits
+## Credits
 
 - PyTorch Team
 - scikit-image

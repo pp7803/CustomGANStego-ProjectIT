@@ -191,8 +191,13 @@ class SteganographyApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Bind canvas resize to update window width
+        def on_canvas_configure(event):
+            canvas.itemconfig(window_id, width=event.width)
+        canvas.bind(\'<Configure>\', on_canvas_configure)
         
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
@@ -265,8 +270,13 @@ class SteganographyApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Bind canvas resize to update window width
+        def on_canvas_configure(event):
+            canvas.itemconfig(window_id, width=event.width)
+        canvas.bind(\'<Configure>\', on_canvas_configure)
         
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
@@ -340,8 +350,13 @@ class SteganographyApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Bind canvas resize to update window width
+        def on_canvas_configure(event):
+            canvas.itemconfig(window_id, width=event.width)
+        canvas.bind(\'<Configure>\', on_canvas_configure)
         
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
@@ -413,8 +428,13 @@ class SteganographyApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Bind canvas resize to update window width
+        def on_canvas_configure(event):
+            canvas.itemconfig(window_id, width=event.width)
+        canvas.bind(\'<Configure>\', on_canvas_configure)
         
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
@@ -474,8 +494,13 @@ class SteganographyApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Bind canvas resize to update window width
+        def on_canvas_configure(event):
+            canvas.itemconfig(window_id, width=event.width)
+        canvas.bind(\'<Configure>\', on_canvas_configure)
         
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
@@ -791,24 +816,37 @@ class SteganographyApp:
                 self.reverse_status.config(text="⏳ Đang reverse...", foreground='blue')
                 self.root.update()
                 
-                # Reverse
-                reverse_hiding(self.reverse_stego_path, output_path, model_path=self.model_path)
+                # Gọi hàm reverse_hiding và kiểm tra kết quả
+                result = reverse_hiding(self.reverse_stego_path, output_path, model_path=self.model_path)
+                
+                # Kiểm tra file đã được tạo thành công
+                if not os.path.exists(output_path):
+                    raise FileNotFoundError(f"File kết quả không được tạo: {output_path}")
+                
                 self.reversed_image_path = output_path
                 
-                # Show preview
+                # Load và hiển thị ảnh kết quả
                 img = Image.open(output_path)
                 img.thumbnail((300, 300))
                 photo = ImageTk.PhotoImage(img)
                 self.reverse_recovered_preview.config(image=photo, text="")
                 self.reverse_recovered_preview.image = photo
                 
+                # Cập nhật status
                 self.reverse_status.config(text=f"✅ Đã lưu: {Path(output_path).name}", 
                                           foreground='green')
-                messagebox.showinfo("Thành công", f"Đã khôi phục và lưu vào:\n{output_path}")
+                
+                # Hiển thị thông báo thành công (dùng root.after để tránh lỗi threading)
+                self.root.after(0, lambda: messagebox.showinfo("Thành công", 
+                    f"Đã khôi phục ảnh cover thành công!\n\nĐường dẫn: {output_path}"))
                 
             except Exception as e:
-                self.reverse_status.config(text=f"❌ Lỗi: {str(e)}", foreground='red')
-                messagebox.showerror("Lỗi", f"Reverse thất bại:\n{str(e)}")
+                import traceback
+                error_msg = str(e)
+                print(f"Lỗi reverse: {error_msg}")
+                print(traceback.format_exc())
+                self.reverse_status.config(text=f"❌ Lỗi: {error_msg}", foreground='red')
+                self.root.after(0, lambda: messagebox.showerror("Lỗi", f"Reverse thất bại:\n{error_msg}"))
         
         threading.Thread(target=reverse_thread, daemon=True).start()
         

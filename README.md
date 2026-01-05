@@ -171,10 +171,10 @@ python train.py
 Model sẽ được lưu trong thư mục `results/model/` với tên format:
 
 ```
-accX.XXXX_psnrXX.XX_ssimX.XXXX_YYYY-MM-DD_HH:MM:SS.dat
+EN_DE_REV_epxxx_acc0.xxx_psnrxx.xx_rpsnrxx.xx_YYYYMMDD_HHMMSS.dat
 ```
 
-Ví dụ: `acc0.9534_psnr35.12_ssim0.9234_2025-12-23_10:30:45.dat`
+Ví dụ: `EN_DE_REV_ep008_acc0.9789_psnr38.56_rpsnr36.76_20251225_152326.dat`
 
 #### Theo dõi quá trình training
 

@@ -1,0 +1,22 @@
+# Virtual Environment
+venv/
+
+# PyInstaller build files
+build/
+dist/
+*.spec.bak
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# macOS
+.DS_Store
+*.dmg
+*.zip
+
+# Temporary files
+*.log
+*.tmp
