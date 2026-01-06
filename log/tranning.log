@@ -1,0 +1,731 @@
+pp7803@pp7803s-MacBook-Pro CustomGANStego % source ../prjvenv/bin/activate
+(prjvenv) pp7803@pp7803s-MacBook-Pro CustomGANStego % python train.py
+✅ Directories created/verified:
+   Model: /Users/pp7803/Desktop/GithubDesktop/ProjectCNTT/CustomGANStego/results/model
+   Plots: /Users/pp7803/Desktop/GithubDesktop/ProjectCNTT/CustomGANStego/results/plots
+
+======================================================================
+IMPROVED TRAINING CONFIGURATION
+======================================================================
+Device: mps
+Pin Memory: False
+Epochs: 60
+Batch size: 4
+LR Critic: 0.0002
+LR Encoder/Decoder: 0.0002
+
+Loss weights:
+  MSE: 70.0
+  SSIM: 25.0
+  Perceptual: 8.0
+  Decoder: 25.0
+  Adversarial: 0.005
+  Reverse Hiding: 50.0
+
+WGAN-GP: True
+Critic iterations: 2
+
+Early Stopping:
+  Stop on target: True
+  Patience: 25 epochs
+
+Targets:
+  Min Decoder Accuracy: 99.0%
+  Min PSNR: 37.0 dB
+  Min SSIM: 0.90
+  Excellent PSNR: 38.0 dB
+======================================================================
+
+Loading VGG16 for perceptual loss (IMPORTANT for color preservation)...
+✅ VGG16 loaded successfully - Perceptual loss ENABLED
+
+======================================================================
+Epoch 1/60 | LR Critic: 0.000200 | LR EncDec: 0.000200
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 1 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.6373
+   Val   Accuracy: 0.7262
+   Train Loss:     0.629921
+   Val   Loss:     0.535411
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.011617
+   Val   MSE:  0.000892
+   Val   SSIM: 0.9633 ✅
+   Val   PSNR: 36.58 dB ❌
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.019792
+   Val   MSE:  0.001294
+   Val   SSIM: 0.9486
+   Val   PSNR: 35.01 dB
+
+💾 Capacity:
+   Val BPP: 0.9049
+
+🎭 Adversarial:
+   Cover Score:     -0.1255
+   Generated Score: -0.2203
+   Margin:          0.0948
+
+✅ NEW BEST! Epoch 1: PSNR=36.58dB, SSIM=0.9633, Acc=72.62%
+❌ POOR - Acc=72.62%, PSNR=36.6dB - Accuracy too low!
+💾 Saved: EN_DE_REV_ep001_acc0.7262_psnr36.58_rpsnr35.01_20251225_141128.dat
+
+
+======================================================================
+Epoch 2/60 | LR Critic: 0.000200 | LR EncDec: 0.000200
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 2 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.8001
+   Val   Accuracy: 0.8747
+   Train Loss:     0.424055
+   Val   Loss:     0.308463
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000881
+   Val   MSE:  0.000695
+   Val   SSIM: 0.9545 ✅
+   Val   PSNR: 37.64 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001568
+   Val   MSE:  0.001032
+   Val   SSIM: 0.9503
+   Val   PSNR: 35.98 dB
+
+💾 Capacity:
+   Val BPP: 1.4987
+
+🎭 Adversarial:
+   Cover Score:     2.6408
+   Generated Score: 1.5865
+   Margin:          1.0543
+
+✅ NEW BEST! Epoch 2: PSNR=37.64dB, SSIM=0.9633, Acc=87.47%
+❌ POOR - Acc=87.47%, PSNR=37.6dB - Accuracy too low!
+💾 Saved: EN_DE_REV_ep002_acc0.8747_psnr37.64_rpsnr35.98_20251225_142143.dat
+
+
+======================================================================
+Epoch 3/60 | LR Critic: 0.000199 | LR EncDec: 0.000199
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 3 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.8952
+   Val   Accuracy: 0.9211
+   Train Loss:     0.256625
+   Val   Loss:     0.208898
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000821
+   Val   MSE:  0.000928
+   Val   SSIM: 0.9457 ✅
+   Val   PSNR: 36.38 dB ❌
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001286
+   Val   MSE:  0.002223
+   Val   SSIM: 0.9393
+   Val   PSNR: 32.69 dB
+
+💾 Capacity:
+   Val BPP: 1.6846
+
+🎭 Adversarial:
+   Cover Score:     5.5413
+   Generated Score: 7.5719
+   Margin:          -2.0306
+
+✅ NEW BEST! Epoch 3: PSNR=37.64dB, SSIM=0.9633, Acc=92.11%
+⚠️  FAIR - Acc=92.11%, PSNR=36.4dB - Continue training
+💾 Saved: EN_DE_REV_ep003_acc0.9211_psnr36.38_rpsnr32.69_20251225_143200.dat
+
+
+======================================================================
+Epoch 4/60 | LR Critic: 0.000199 | LR EncDec: 0.000199
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 4 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9291
+   Val   Accuracy: 0.9463
+   Train Loss:     0.182643
+   Val   Loss:     0.146681
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000861
+   Val   MSE:  0.000634
+   Val   SSIM: 0.9470 ✅
+   Val   PSNR: 38.01 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001225
+   Val   MSE:  0.000702
+   Val   SSIM: 0.9487
+   Val   PSNR: 37.58 dB
+
+💾 Capacity:
+   Val BPP: 1.7850
+
+🎭 Adversarial:
+   Cover Score:     1.9923
+   Generated Score: -1.4176
+   Margin:          3.4099
+
+✅ NEW BEST! Epoch 4: PSNR=38.01dB, SSIM=0.9633, Acc=94.63%
+⚠️  FAIR - Acc=94.63%, PSNR=38.0dB - Continue training
+💾 Saved: EN_DE_REV_ep004_acc0.9463_psnr38.01_rpsnr37.58_20251225_144217.dat
+
+
+======================================================================
+Epoch 5/60 | LR Critic: 0.000198 | LR EncDec: 0.000198
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 5 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9464
+   Val   Accuracy: 0.9636
+   Train Loss:     0.141871
+   Val   Loss:     0.104471
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000882
+   Val   MSE:  0.000778
+   Val   SSIM: 0.9433 ✅
+   Val   PSNR: 37.14 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001212
+   Val   MSE:  0.001031
+   Val   SSIM: 0.9468
+   Val   PSNR: 35.94 dB
+
+💾 Capacity:
+   Val BPP: 1.8543
+
+🎭 Adversarial:
+   Cover Score:     -6.9194
+   Generated Score: -7.2620
+   Margin:          0.3426
+
+✅ NEW BEST! Epoch 5: PSNR=38.01dB, SSIM=0.9633, Acc=96.36%
+✅ GOOD MODEL - Acc=96.36%, PSNR=37.1dB
+💡 On track to 99%, keep training...
+💾 Saved: EN_DE_REV_ep005_acc0.9636_psnr37.14_rpsnr35.94_20251225_145234.dat
+
+
+======================================================================
+Epoch 6/60 | LR Critic: 0.000197 | LR EncDec: 0.000197
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 6 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9554
+   Val   Accuracy: 0.9680
+   Train Loss:     0.117713
+   Val   Loss:     0.089308
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000856
+   Val   MSE:  0.000741
+   Val   SSIM: 0.9432 ✅
+   Val   PSNR: 37.39 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001142
+   Val   MSE:  0.000840
+   Val   SSIM: 0.9499
+   Val   PSNR: 36.85 dB
+
+💾 Capacity:
+   Val BPP: 1.8721
+
+🎭 Adversarial:
+   Cover Score:     5.3224
+   Generated Score: 8.4862
+   Margin:          -3.1638
+
+✅ NEW BEST! Epoch 6: PSNR=38.01dB, SSIM=0.9633, Acc=96.80%
+✅ GOOD MODEL - Acc=96.80%, PSNR=37.4dB
+💡 On track to 99%, keep training...
+💾 Saved: EN_DE_REV_ep006_acc0.9680_psnr37.39_rpsnr36.85_20251225_150252.dat
+
+
+======================================================================
+Epoch 7/60 | LR Critic: 0.000195 | LR EncDec: 0.000195
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 7 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9623
+   Val   Accuracy: 0.9779
+   Train Loss:     0.101350
+   Val   Loss:     0.064418
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000850
+   Val   MSE:  0.000679
+   Val   SSIM: 0.9470 ✅
+   Val   PSNR: 37.77 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001114
+   Val   MSE:  0.000824
+   Val   SSIM: 0.9521
+   Val   PSNR: 36.96 dB
+
+💾 Capacity:
+   Val BPP: 1.9116
+
+🎭 Adversarial:
+   Cover Score:     -4.7513
+   Generated Score: -3.5863
+   Margin:          -1.1650
+
+✅ NEW BEST! Epoch 7: PSNR=38.01dB, SSIM=0.9633, Acc=97.79%
+✅ GOOD MODEL - Acc=97.79%, PSNR=37.8dB
+💡 On track to 99%, keep training...
+💾 Saved: EN_DE_REV_ep007_acc0.9779_psnr37.77_rpsnr36.96_20251225_151309.dat
+
+
+======================================================================
+Epoch 8/60 | LR Critic: 0.000193 | LR EncDec: 0.000193
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 8 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9686
+   Val   Accuracy: 0.9789
+   Train Loss:     0.085040
+   Val   Loss:     0.059866
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000809
+   Val   MSE:  0.000574
+   Val   SSIM: 0.9547 ✅
+   Val   PSNR: 38.56 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001053
+   Val   MSE:  0.000859
+   Val   SSIM: 0.9579
+   Val   PSNR: 36.76 dB
+
+💾 Capacity:
+   Val BPP: 1.9156
+
+🎭 Adversarial:
+   Cover Score:     -3.9864
+   Generated Score: -2.3013
+   Margin:          -1.6850
+
+✅ NEW BEST! Epoch 8: PSNR=38.56dB, SSIM=0.9633, Acc=97.89%
+✅ GOOD MODEL - Acc=97.89%, PSNR=38.6dB
+💡 On track to 99%, keep training...
+💾 Saved: EN_DE_REV_ep008_acc0.9789_psnr38.56_rpsnr36.76_20251225_152326.dat
+
+
+======================================================================
+Epoch 9/60 | LR Critic: 0.000191 | LR EncDec: 0.000191
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 9 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9712
+   Val   Accuracy: 0.9828
+   Train Loss:     0.078126
+   Val   Loss:     0.050951
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000804
+   Val   MSE:  0.000655
+   Val   SSIM: 0.9561 ✅
+   Val   PSNR: 38.00 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001061
+   Val   MSE:  0.000985
+   Val   SSIM: 0.9624
+   Val   PSNR: 36.19 dB
+
+💾 Capacity:
+   Val BPP: 1.9312
+
+🎭 Adversarial:
+   Cover Score:     -3.0290
+   Generated Score: -0.4028
+   Margin:          -2.6262
+
+✅ NEW BEST! Epoch 9: PSNR=38.56dB, SSIM=0.9633, Acc=98.28%
+🎉 EXCELLENT MODEL - Acc=98.28%, PSNR=38.0dB
+💡 Very close to 99% target, continue for perfection...
+💾 Saved: EN_DE_REV_ep009_acc0.9828_psnr38.00_rpsnr36.19_20251225_153344.dat
+
+
+======================================================================
+Epoch 10/60 | LR Critic: 0.000189 | LR EncDec: 0.000189
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 10 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9758
+   Val   Accuracy: 0.9864
+   Train Loss:     0.066823
+   Val   Loss:     0.039918
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000784
+   Val   MSE:  0.000708
+   Val   SSIM: 0.9496 ✅
+   Val   PSNR: 37.67 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.000984
+   Val   MSE:  0.000849
+   Val   SSIM: 0.9567
+   Val   PSNR: 36.84 dB
+
+💾 Capacity:
+   Val BPP: 1.9454
+
+🎭 Adversarial:
+   Cover Score:     -0.5519
+   Generated Score: -0.7949
+   Margin:          0.2430
+
+✅ NEW BEST! Epoch 10: PSNR=38.56dB, SSIM=0.9633, Acc=98.64%
+🎉 EXCELLENT MODEL - Acc=98.64%, PSNR=37.7dB
+💡 Very close to 99% target, continue for perfection...
+💾 Saved: EN_DE_REV_ep010_acc0.9864_psnr37.67_rpsnr36.84_20251225_154402.dat
+
+
+======================================================================
+Epoch 11/60 | LR Critic: 0.000187 | LR EncDec: 0.000187
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 11 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9763
+   Val   Accuracy: 0.9859
+   Train Loss:     0.065779
+   Val   Loss:     0.041236
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000793
+   Val   MSE:  0.000630
+   Val   SSIM: 0.9576 ✅
+   Val   PSNR: 38.35 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.001001
+   Val   MSE:  0.000638
+   Val   SSIM: 0.9649
+   Val   PSNR: 38.28 dB
+
+💾 Capacity:
+   Val BPP: 1.9437
+
+🎭 Adversarial:
+   Cover Score:     -3.6661
+   Generated Score: -1.3507
+   Margin:          -2.3155
+
+✅ NEW BEST! Epoch 11: PSNR=38.56dB, SSIM=0.9633, Acc=98.59%
+🎉 EXCELLENT MODEL - Acc=98.59%, PSNR=38.3dB
+💡 Very close to 99% target, continue for perfection...
+💾 Saved: EN_DE_REV_ep011_acc0.9859_psnr38.35_rpsnr38.28_20251225_155421.dat
+
+
+======================================================================
+Epoch 12/60 | LR Critic: 0.000184 | LR EncDec: 0.000184
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 12 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9796
+   Val   Accuracy: 0.9870
+   Train Loss:     0.056527
+   Val   Loss:     0.037980
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000711
+   Val   MSE:  0.000661
+   Val   SSIM: 0.9607 ✅
+   Val   PSNR: 38.00 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.000901
+   Val   MSE:  0.001122
+   Val   SSIM: 0.9601
+   Val   PSNR: 35.69 dB
+
+💾 Capacity:
+   Val BPP: 1.9481
+
+🎭 Adversarial:
+   Cover Score:     -5.7679
+   Generated Score: -2.6672
+   Margin:          -3.1007
+
+✅ NEW BEST! Epoch 12: PSNR=38.56dB, SSIM=0.9633, Acc=98.70%
+🎉 EXCELLENT MODEL - Acc=98.70%, PSNR=38.0dB
+💡 Very close to 99% target, continue for perfection...
+💾 Saved: EN_DE_REV_ep012_acc0.9870_psnr38.00_rpsnr35.69_20251225_160440.dat
+
+
+======================================================================
+Epoch 13/60 | LR Critic: 0.000181 | LR EncDec: 0.000181
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 13 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9805
+   Val   Accuracy: 0.9879
+   Train Loss:     0.054262
+   Val   Loss:     0.035046
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000701
+   Val   MSE:  0.000523
+   Val   SSIM: 0.9648 ✅
+   Val   PSNR: 39.09 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.000878
+   Val   MSE:  0.000798
+   Val   SSIM: 0.9667
+   Val   PSNR: 37.16 dB
+
+💾 Capacity:
+   Val BPP: 1.9518
+
+🎭 Adversarial:
+   Cover Score:     -8.2727
+   Generated Score: -5.9330
+   Margin:          -2.3397
+
+✅ NEW BEST! Epoch 13: PSNR=39.09dB, SSIM=0.9648, Acc=98.79%
+🎉 EXCELLENT MODEL - Acc=98.79%, PSNR=39.1dB
+💡 Very close to 99% target, continue for perfection...
+💾 Saved: EN_DE_REV_ep013_acc0.9879_psnr39.09_rpsnr37.16_20251225_161501.dat
+
+
+======================================================================
+Epoch 14/60 | LR Critic: 0.000178 | LR EncDec: 0.000178
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 14 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9823
+   Val   Accuracy: 0.9884
+   Train Loss:     0.049502
+   Val   Loss:     0.033965
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000686
+   Val   MSE:  0.000606
+   Val   SSIM: 0.9629 ✅
+   Val   PSNR: 38.42 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.000870
+   Val   MSE:  0.000592
+   Val   SSIM: 0.9680
+   Val   PSNR: 38.53 dB
+
+💾 Capacity:
+   Val BPP: 1.9534
+
+🎭 Adversarial:
+   Cover Score:     -8.8086
+   Generated Score: -7.1870
+   Margin:          -1.6216
+
+✅ NEW BEST! Epoch 14: PSNR=39.09dB, SSIM=0.9648, Acc=98.84%
+🎉 EXCELLENT MODEL - Acc=98.84%, PSNR=38.4dB
+💡 Very close to 99% target, continue for perfection...
+💾 Saved: EN_DE_REV_ep014_acc0.9884_psnr38.42_rpsnr38.53_20251225_162519.dat
+
+
+======================================================================
+Epoch 15/60 | LR Critic: 0.000174 | LR EncDec: 0.000174
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 15 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9820
+   Val   Accuracy: 0.9861
+   Train Loss:     0.050287
+   Val   Loss:     0.039245
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000681
+   Val   MSE:  0.000675
+   Val   SSIM: 0.9649 ✅
+   Val   PSNR: 38.04 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.000835
+   Val   MSE:  0.001326
+   Val   SSIM: 0.9614
+   Val   PSNR: 35.02 dB
+
+💾 Capacity:
+   Val BPP: 1.9443
+
+🎭 Adversarial:
+   Cover Score:     2.4319
+   Generated Score: 5.7141
+   Margin:          -3.2822
+
+✅ NEW BEST! Epoch 15: PSNR=39.09dB, SSIM=0.9649, Acc=98.61%
+🎉 EXCELLENT MODEL - Acc=98.61%, PSNR=38.0dB
+💡 Very close to 99% target, continue for perfection...
+💾 Saved: EN_DE_REV_ep015_acc0.9861_psnr38.04_rpsnr35.02_20251225_163537.dat
+
+
+======================================================================
+Epoch 16/60 | LR Critic: 0.000171 | LR EncDec: 0.000171
+======================================================================
+Training Critic (2x iterations)...
+Training Encoder-Decoder...                                                     
+Validating...                                                                   
+                                                                                
+──────────────────────────────────────────────────────────────────────
+Epoch 16 Summary:
+──────────────────────────────────────────────────────────────────────
+📊 Decoder Performance:
+   Train Accuracy: 0.9830
+   Val   Accuracy: 0.9901
+   Train Loss:     0.047999
+   Val   Loss:     0.028986
+
+🖼️  Image Quality (Stego):
+   Train MSE:  0.000631
+   Val   MSE:  0.000504
+   Val   SSIM: 0.9665 ✅
+   Val   PSNR: 39.22 dB ✅
+
+🔄 Reverse Hiding (Cover Recovery):
+   Train MSE:  0.000774
+   Val   MSE:  0.000784
+   Val   SSIM: 0.9695
+   Val   PSNR: 37.24 dB
+
+💾 Capacity:
+   Val BPP: 1.9604
+
+🎭 Adversarial:
+   Cover Score:     -6.1416
+   Generated Score: -4.1094
+   Margin:          -2.0322
+
+✅ NEW BEST! Epoch 16: PSNR=39.22dB, SSIM=0.9665, Acc=99.01%
+🎉🎉🎉 PERFECT MODEL - Acc=99.01%, PSNR=39.2dB
+🏁 99% accuracy + 37 dB PSNR achieved! Will stop after saving.
+💾 Saved: EN_DE_REV_ep016_acc0.9901_psnr39.22_rpsnr37.24_20251225_164557.dat
+
+
+======================================================================
+🏁 STOPPING - TARGET REACHED at epoch 16
+======================================================================
+Final metrics:
+  Decoder Accuracy: 99.01%
+  PSNR: 39.22 dB
+  SSIM: 0.9665
+  Reverse PSNR: 37.24 dB
+======================================================================
+💡 To train full 60 epochs, set stop_on_target=False
+======================================================================
+
+
+======================================================================
+✅ TRAINING COMPLETE!
+======================================================================
+Total epochs: 16
+Best epoch: 16
+Best PSNR: 39.22 dB
+Best SSIM: 0.9665
+======================================================================
+

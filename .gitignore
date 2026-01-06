@@ -30,9 +30,6 @@ __pycache__/
 *.zip
 *.tar.gz
 
-# Logs
-*.log
-
 # IDEs
 .vscode/
 .idea/
