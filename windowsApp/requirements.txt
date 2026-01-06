@@ -1,5 +1,5 @@
 # CustomGANStego Windows App Requirements
-# =======================================
+# ========================================
 
 # Deep Learning
 torch>=2.0.0
@@ -11,8 +11,13 @@ imageio>=2.25.0
 numpy>=1.24.0
 scikit-image>=0.20.0
 matplotlib>=3.7.0
+opencv-python>=4.8.0
 
-# Encryption
+# Scientific Computing
+# Note: scipy>=1.14.0 required for Python 3.13 and PyInstaller compatibility
+scipy>=1.14.0
+
+# Encryption (RSA + AES)
 pycryptodome>=3.17.0
 
 # Error Correction
@@ -26,3 +31,4 @@ psutil>=5.9.0
 
 # Build Tools
 pyinstaller>=5.10.0
+

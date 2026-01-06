@@ -4,66 +4,42 @@
 
 ## Features
 
-- **Encode Encode** - Giấu tin vào ảnh với GAN
-- **Decode Decode** - Trích xuất tin từ ảnh stego
-- **Reverse Reverse** - Khôi phục ảnh gốc (lossless)
-- **GenRSA GenRSA** - Tạo khóa RSA cho mã hóa
-- **Compare Compare** - Tính PSNR/SSIM/MSE metrics
-- **Security Encryption** - RSA+AES hybrid encryption
+- **🖼️ Encode** - Giấu tin vào ảnh với GAN
+- **🔍 Decode** - Trích xuất tin từ ảnh stego
+- **↩️ Reverse** - Khôi phục ảnh gốc (lossless)
+- **🔐 GenRSA** - Tạo khóa RSA cho mã hóa
+- **📊 Compare** - Tính PSNR/SSIM/MSE metrics
+- **🔒 Encryption** - RSA+AES hybrid encryption
 
 ## Quick Start
 
 ### One-Command Build (Khuyến nghị)
 
-```cmd
+```batch
 cd windowsApp
 build_app.bat
 ```
 
 Script `build_app.bat` tích hợp tất cả chức năng:
 
-1.  **Tự động kiểm tra Python** - Yêu cầu Python 3.8+
-2.  **Tự động tạo venv riêng** - Tạo `windowsApp\venv\` nếu chưa có
-3.  **Tự động cài dependencies** - Cài đặt tất cả packages từ requirements.txt
-4.  **Kiểm tra model files** - Kiểm tra model đã train
-5.  **Build executable** - Tạo CustomGANStego.exe với PyInstaller
-6.  **Hướng dẫn sử dụng** - Interactive guide
+1. **Tự động kiểm tra Python** - Yêu cầu Python 3.10+
+2. **Tự động tạo venv riêng** - Tạo `windowsApp\venv\` nếu chưa có
+3. **Tự động cài dependencies** - Cài đặt tất cả packages từ requirements.txt
+4. **Kiểm tra model files** - Kiểm tra model đã train
+5. **Build exe** - Tạo CustomGANStego.exe (onefile)
+6. **Hướng dẫn sử dụng** - Interactive guide
 
 **Output:**
 
-- `dist\CustomGANStego.exe` - Windows executable (~150-200 MB)
+- `dist\CustomGANStego.exe` - Windows executable (~294 MB)
 
-### Setup Only (Không build)
+### Run Directly
 
-Chỉ tạo và cài đặt môi trường ảo mà không build app:
-
-```cmd
-build_app.bat --setup-only
-REM hoặc
-build_app.bat -s
-```
-
-### Run Application
-
-**Từ Build:**
-
-```cmd
+```batch
 dist\CustomGANStego.exe
 ```
 
-**Hoặc Double-click:**
-
-- Mở Windows Explorer
-- Vào thư mục `dist\`
-- Double-click `CustomGANStego.exe`
-
-**Development Mode:**
-
-```cmd
-cd windowsApp
-venv\Scripts\activate
-python steganography_app.py
-```
+Hoặc double-click vào file exe.
 
 ## Virtual Environment (Môi trường ảo riêng)
 
@@ -74,32 +50,32 @@ Windows App sử dụng **môi trường ảo riêng** tại `windowsApp\venv\`,
 Script `build_app.bat` sẽ tự động:
 
 - Tạo `venv\` nếu chưa tồn tại
-- Kiểm tra và sửa chữa nếu venv bị hỏng
+- Kích hoạt môi trường ảo
 - Cài đặt dependencies nếu thiếu
 
 **Không cần chạy script riêng!**
 
 ### Manual setup (nếu cần)
 
-```cmd
+```batch
 cd windowsApp
 
 REM Tạo venv
 python -m venv venv
 
 REM Kích hoạt
-venv\Scripts\activate
+venv\Scripts\activate.bat
 
 REM Cài dependencies
-python -m pip install --upgrade pip
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 ### Sử dụng môi trường
 
-```cmd
+```batch
 REM Kích hoạt
-venv\Scripts\activate
+venv\Scripts\activate.bat
 
 REM Kiểm tra
 where python
@@ -109,432 +85,453 @@ REM Tắt
 deactivate
 ```
 
-## Requirements
+### Development Mode
 
-### System Requirements
-
-- **OS**: Windows 7/8/10/11 (64-bit)
-- **RAM**: 4GB minimum, 8GB recommended
-- **Storage**: 500MB free space
-- **Python**: 3.8+ (for building only, not needed for running .exe)
-
-### Build Requirements
-
-Nếu build từ source:
-
-```cmd
-pip install -r requirements.txt
-```
-
-Dependencies chính:
-
-- torch>=2.0.0
-- torchvision>=0.15.0
-- Pillow>=9.0.0
-- scikit-image>=0.20.0
-- pycryptodome>=3.17.0
-- pyinstaller>=5.10.0
-
-## Build từ Source (Nâng cao)
-
-> **Lưu ý**: Script `build_app.bat` đã tự động làm tất cả. Phần này chỉ dành cho debug.
-
-### Bước 1: Setup môi trường
-
-```cmd
+```batch
 cd windowsApp
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
+venv\Scripts\activate.bat
+python steganography_app.py
 ```
 
-### Bước 2: Chuẩn bị model
+## Requirements 📋
 
-Đảm bảo có model trong `results\model\`:
-
-```cmd
-dir ..\results\model\*.dat
+```
+torch>=2.0.0              # Deep Learning framework
+torchvision>=0.15.0       # Computer Vision
+Pillow>=9.0.0             # Image processing
+imageio>=2.25.0           # Image I/O
+numpy>=1.24.0             # Numerical computing
+scikit-image>=0.20.0      # PSNR/SSIM metrics
+matplotlib>=3.7.0         # Visualization
+opencv-python>=4.8.0      # OpenCV
+scipy>=1.14.0             # Scientific computing (Python 3.13+)
+pycryptodome>=3.17.0      # RSA+AES encryption
+reedsolo>=1.7.0           # Error correction
+psutil>=5.9.0             # System monitoring
+pyinstaller>=5.10.0       # Build tool
 ```
 
-Nếu chưa có, train model trước:
+Auto-installed by `build_app.bat`
 
-```cmd
-cd ..
-python train.py
-cd windowsApp
+## Usage Guide
+
+### 1. Encode (Giấu tin)
+
+1. Tab **🖼️ Encode**
+2. Chọn ảnh cover
+3. Nhập tin nhắn
+4. (Optional) Enable RSA+AES encryption
+5. Click **Encode**
+6. Lưu ảnh stego
+
+### 2. Decode (Trích xuất)
+
+1. Tab **🔍 Decode**
+2. Chọn ảnh stego
+3. (If encrypted) Enable decryption + chọn private key
+4. Click **Decode**
+5. Xem tin nhắn
+
+### 3. Reverse (Khôi phục)
+
+1. Tab **↩️ Reverse**
+2. Chọn ảnh stego
+3. Click **Reverse**
+4. Lưu ảnh recovered
+
+### 4. GenRSA (Tạo khóa)
+
+1. Tab **🔐 GenRSA**
+2. Chọn key size (2048 bits recommended)
+3. Chọn thư mục lưu
+4. Click **Tạo khóa**
+5. Nhận public_key.pem + private_key.pem
+
+### 5. Compare (So sánh)
+
+1. Tab **📊 Compare**
+2. Chọn 2 ảnh
+3. Click **Tính Metrics**
+4. Xem PSNR/SSIM/MSE
+5. (Optional) Lưu comparison image
+
+## Workflow Examples
+
+### Basic Steganography
+
+```
+Cover.png + "Secret" → Encode → Stego.png
+Stego.png → Decode → "Secret"
 ```
 
-### Bước 3: Build executable
+### With Encryption
 
-**Tự động (khuyến nghị):**
-
-```cmd
-build_app.bat
+```
+GenRSA → public_key.pem + private_key.pem
+Cover.png + "Secret" + public_key → Encode → Stego.png
+Stego.png + private_key → Decode → "Secret"
 ```
 
-**Thủ công:**
+### Reversible Steganography
 
-```cmd
-pyinstaller --clean ^
-    --name="CustomGANStego" ^
-    --windowed ^
-    --onefile ^
-    --add-data="../results/model;results/model" ^
-    --add-data="../encoder.py;." ^
-    --add-data="../decoder.py;." ^
-    --add-data="../critic.py;." ^
-    --add-data="../reverse_decoder.py;." ^
-    --add-data="../enhancedstegan.py;." ^
-    --hidden-import=torch ^
-    --collect-all torch ^
-    steganography_app.py
+```
+Cover.png → Encode → Stego.png
+Stego.png → Reverse → Recovered.png
+Compare: Cover vs Recovered (PSNR >45 dB)
 ```
 
-### Bước 4: Test executable
+## Quality Metrics
 
-```cmd
-dist\CustomGANStego.exe
-```
-
-## Sử dụng Application
-
-### Interface Overview
-
-App có 5 tabs chính:
-
-1. **Encode Encode Tab**
-
-   - Chọn ảnh cover
-   - Nhập tin cần giấu
-   - Tùy chọn mã hóa RSA+AES
-   - Export ảnh stego
-
-2. **Decode Decode Tab**
-
-   - Chọn ảnh stego
-   - Tùy chọn giải mã
-   - Xem/lưu tin đã trích xuất
-
-3. **Reverse Reverse Tab**
-
-   - Chọn ảnh stego
-   - Khôi phục ảnh cover gốc
-   - Preview trước/sau
-
-4. **GenRSA GenRSA Tab**
-
-   - Tạo cặp khóa RSA
-   - Chọn độ dài khóa (1024-4096 bits)
-   - Lưu public/private key
-
-5. **Compare Compare Tab**
-   - So sánh 2 ảnh
-   - Tính PSNR/SSIM/MSE
-   - Hiển thị difference map
-
-### Workflow Example
-
-#### 1. Tạo khóa RSA (lần đầu)
-
-- Vào tab **GenRSA GenRSA**
-- Chọn độ dài khóa: 2048 bits
-- Chọn thư mục lưu
-- Click "GenRSA Tạo khóa"
-- Lưu `public_key.pem` và `private_key.pem`
-
-#### 2. Giấu tin có mã hóa
-
-- Vào tab **Encode Encode**
-- Click "Chọn ảnh..." → chọn ảnh cover
-- Nhập tin cần giấu
-- Check "Sử dụng mã hóa RSA+AES"
-- Click "Chọn public key..." → chọn `public_key.pem`
-- Click "Encode Encode"
-- Lưu ảnh stego
-
-#### 3. Trích xuất tin
-
-- Vào tab **Decode Decode**
-- Click "Chọn ảnh..." → chọn ảnh stego
-- Check "Giải mã RSA+AES"
-- Click "Chọn private key..." → chọn `private_key.pem`
-- Click "Decode Decode"
-- Tin sẽ hiển thị trong textbox
-- Có thể click "Save Save" để lưu ra file
-
-#### 4. Khôi phục ảnh gốc
-
-- Vào tab **Reverse Reverse**
-- Click "Chọn ảnh..." → chọn ảnh stego
-- Click "Reverse Reverse"
-- Lưu ảnh đã khôi phục
-- Preview hiển thị stego vs recovered
-
-#### 5. Đánh giá chất lượng
-
-- Vào tab **Compare Compare**
-- Click "Chọn ảnh 1..." → chọn cover gốc
-- Click "Chọn ảnh 2..." → chọn stego/recovered
-- Click "Compare Tính Metrics"
-- Xem PSNR/SSIM/MSE
-- Click "Save Save PNG" để lưu comparison
-
-## Customization
-
-### Theme & Style
-
-File `steganography_app.py` sử dụng Windows native theme:
-
-```python
-style = ttk.Style()
-style.theme_use('vista')  # Windows Vista/7/8/10/11
-```
-
-Có thể thay đổi theme:
-
-- `'winnative'` - Windows classic
-- `'clam'` - Modern flat
-- `'alt'` - Alternative
-- `'default'` - Default
-
-### Window Size
-
-Mặc định: 1200x800
-
-Thay đổi trong `steganography_app.py`:
-
-```python
-self.root.geometry("1400x900")  # Larger window
-```
-
-### Icon
-
-Thêm icon cho app:
-
-1. Tạo file `icon.ico` (256x256 hoặc 128x128)
-2. Đặt trong thư mục `windowsApp\`
-3. Update build command:
-   ```cmd
-   --icon=icon.ico
-   ```
-
-## Requirements Distribution
-
-### Chuẩn bị cho Distribution
-
-**File cần có:**
-
-- `dist\CustomGANStego.exe` - Ứng dụng chính
-
-**Optional:**
-
-- `README.txt` - Hướng dẫn sử dụng
-- `sample_images\` - Ảnh mẫu để test
-- `LICENSE.txt` - License information
-
-### Tạo Installer (Optional)
-
-Sử dụng NSIS hoặc Inno Setup để tạo installer:
-
-**Inno Setup Script Example:**
-
-```iss
-[Setup]
-AppName=CustomGANStego
-AppVersion=1.0
-DefaultDirName={pf}\CustomGANStego
-DefaultGroupName=CustomGANStego
-OutputDir=installer
-OutputBaseFilename=CustomGANStego-Setup
-
-[Files]
-Source: "dist\CustomGANStego.exe"; DestDir: "{app}"
-Source: "README.txt"; DestDir: "{app}"
-
-[Icons]
-Name: "{group}\CustomGANStego"; Filename: "{app}\CustomGANStego.exe"
-```
-
-### Code Signing (Optional)
-
-Để tránh Windows SmartScreen warning:
-
-1. Mua code signing certificate
-2. Sign executable:
-   ```cmd
-   signtool sign /f certificate.pfx /p password /t http://timestamp.digicert.com dist\CustomGANStego.exe
-   ```
+| Metric | Good      | Excellent |
+| ------ | --------- | --------- |
+| PSNR   | 30-40 dB  | >40 dB    |
+| SSIM   | 0.90-0.95 | >0.95     |
+| MSE    | <100      | <50       |
 
 ## Troubleshooting
 
-### App không khởi động
+### App không mở / crash ngay khi khởi động
 
-**Triệu chứng:** Double-click không có gì xảy ra
+```batch
+REM Chạy từ command prompt để xem lỗi
+cd dist
+CustomGANStego.exe
 
-**Giải pháp:**
-
-1. Chạy từ Command Prompt để xem error:
-   ```cmd
-   dist\CustomGANStego.exe
-   ```
-2. Check Windows Event Viewer → Application logs
-3. Tạm tắt Antivirus và thử lại
-
-### Antivirus cảnh báo
-
-**Triệu chứng:** Windows Defender/Antivirus block .exe
-
-**Giải pháp:**
-
-- False positive do PyInstaller
-- Thêm exception trong Antivirus
-- Upload file lên VirusTotal để verify
-- Submit false positive report đến antivirus vendor
-
-### DLL không tìm thấy
-
-**Triệu chứng:** Error "VCRUNTIME140.dll not found"
-
-**Giải pháp:**
-
-- Cài Visual C++ Redistributable:
-  https://aka.ms/vs/17/release/vc_redist.x64.exe
-
-### Model không load
-
-**Triệu chứng:** " No model found"
-
-**Giải pháp:**
-
-1. Check model files trong build:
-   ```cmd
-   pyinstaller --log-level DEBUG ...
-   ```
-2. Verify --add-data path đúng
-3. Rebuild với đường dẫn model chính xác
-
-### App chậm khởi động
-
-**Triệu chứng:** Lần đầu mở mất 10-20 giây
-
-**Giải pháp:**
-
-- Normal behavior (PyInstaller extract files)
-- Lần sau sẽ nhanh hơn
-- Không thể tránh với --onefile mode
-
-### Out of Memory
-
-**Triệu chứng:** App crash khi encode ảnh lớn
-
-**Giải pháp:**
-
-- Giảm kích thước ảnh input
-- Resize ảnh xuống 1024x1024 hoặc nhỏ hơn
-- Tăng RAM máy tính
-
-## Advanced
-
-### Multi-file Build
-
-Nếu muốn build nhỏ hơn (không bundle everything):
-
-```cmd
-pyinstaller --onedir steganography_app.py
+REM Nếu bị antivirus block, thêm exception
+REM Windows Security > Virus & threat protection > Exclusions
 ```
 
-Tạo thư mục `dist\CustomGANStego\` với nhiều files.
+### Model not found
 
-### Custom PyInstaller Spec
-
-Tạo file `steganography_app.spec` để customize:
-
-```python
-# -*- mode: python ; coding: utf-8 -*-
-
-a = Analysis(
-    ['steganography_app.py'],
-    pathex=[],
-    binaries=[],
-    datas=[
-        ('../results/model', 'results/model'),
-        ('../*.py', '.'),
-    ],
-    hiddenimports=['torch', 'torchvision', 'PIL', 'numpy', 'skimage', 'Crypto'],
-    hookspath=[],
-    hooksconfig={},
-    runtime_hooks=[],
-    excludes=[],
-    noarchive=False,
-)
-
-pyz = PYZ(a.pure)
-
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.datas,
-    [],
-    name='CustomGANStego',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,  # Compress with UPX
-    console=False,  # Windowed mode
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
-)
+```batch
+cd ..
+python train.py  # Train models first
 ```
 
-Build với spec:
+### Dependencies missing
 
-```cmd
-pyinstaller steganography_app.spec
+```batch
+pip install -r requirements.txt
 ```
 
-### UPX Compression
+### scipy import error (NameError: 'obj')
 
-Giảm kích thước exe với UPX:
+```batch
+REM Lỗi này xảy ra với scipy 1.11.x
+REM Cần scipy>=1.14.0 cho Python 3.13
 
-1. Download UPX: https://upx.github.io/
-2. Extract vào PATH
-3. Build với `--upx-dir`:
-   ```cmd
-   pyinstaller --upx-dir=C:\path\to\upx ...
-   ```
+pip uninstall scipy
+pip install "scipy>=1.14.0"
+```
 
-## Additional Resources
+### PyInstaller build failed
 
-- **PyInstaller Docs**: https://pyinstaller.org/
-- **Windows Dev Center**: https://developer.microsoft.com/windows/
-- **Inno Setup**: https://jrsoftware.org/isinfo.php
-- **NSIS**: https://nsis.sourceforge.io/
+```batch
+REM Clean build
+rmdir /s /q build
+rmdir /s /q dist
+rmdir /s /q venv
 
-## Support
+REM Rebuild
+build_app.bat
+```
 
-Nếu gặp vấn đề:
+### Windows Defender blocks exe
 
-1. Check [Troubleshooting](#-troubleshooting) section
-2. Run với console mode để xem errors:
-   ```cmd
-   pyinstaller --console steganography_app.py
-   ```
-3. Create issue trên GitHub với:
-   - Windows version
-   - Python version
-   - Error message/screenshot
-   - Build log
+1. Open Windows Security
+2. Virus & threat protection
+3. Protection history
+4. Allow the blocked app
+5. Or add exclusion for `dist\CustomGANStego.exe`
+
+## Structure
+
+```
+windowsApp/
+├── steganography_app.py      # Main app
+├── build_app.bat             # Build script (with all hidden imports)
+├── requirements.txt          # Python dependencies
+├── README.md                 # This file
+├── build/                    # Build artifacts (ignored)
+└── dist/                     # Distribution
+    └── CustomGANStego.exe    # Windows executable
+```
+
+## 🔒 Security Notes
+
+- **Private key**: KHÔNG chia sẻ
+- **Public key**: Có thể chia sẻ công khai
+- **Stego image**: An toàn để gửi (tin đã mã hóa)
+- **Backup**: Lưu private key ở nơi an toàn
+
+## Tips
+
+- Use PNG for best quality
+- PSNR >40 dB = invisible to human eye
+- Enable encryption for sensitive data
+- Backup private keys securely
+- Check comparison metrics before sending
+- First run may take 10-15 seconds to extract
+
+## Hướng dẫn sử dụng chi tiết
+
+### 1. Encode - Giấu tin vào ảnh
+
+**Bước 1:** Chọn ảnh Cover
+- Click nút "Chọn ảnh..."
+- Chọn ảnh PNG/JPG làm cover image
+
+**Bước 2:** Nhập tin cần giấu
+- Gõ hoặc paste tin nhắn vào text box
+- Có thể nhập văn bản dài tùy ý
+
+**Bước 3:** (Tùy chọn) Bật mã hóa
+- Check "Sử dụng mã hóa RSA+AES"
+- Chọn public key (.pem file)
+
+**Bước 4:** Encode
+- Click "Encode"
+- Chọn nơi lưu ảnh stego
+- Đợi quá trình hoàn tất
+
+**Kết quả:** Ảnh stego với tin đã được giấu bên trong
+
+---
+
+### 2. Decode - Trích xuất tin
+
+**Bước 1:** Chọn ảnh Stego
+- Click "Chọn ảnh..."
+- Chọn ảnh stego đã tạo trước đó
+
+**Bước 2:** (Nếu có mã hóa) Giải mã
+- Check "Giải mã RSA+AES"
+- Chọn private key (.pem file)
+
+**Bước 3:** Decode
+- Click "Decode"
+- Tin nhắn sẽ hiển thị trong text box
+
+**Bước 4:** Lưu kết quả (optional)
+- Click "Save"
+- Lưu tin nhắn ra file .txt
+
+---
+
+### 3. Reverse - Khôi phục ảnh gốc
+
+**Bước 1:** Chọn ảnh Stego
+- Click "Chọn ảnh..."
+- Chọn ảnh stego cần khôi phục
+
+**Bước 2:** Reverse
+- Click "Reverse"
+- Chọn nơi lưu ảnh đã khôi phục
+- Đợi quá trình xử lý
+
+**Bước 3:** Xem kết quả
+- Ảnh stego và recovered sẽ hiển thị song song
+- So sánh trực quan
+
+---
+
+### 4. GenRSA - Tạo cặp khóa RSA
+
+**Bước 1:** Chọn độ dài khóa
+- 1024 bits - Nhanh, bảo mật thấp
+- 2048 bits - Khuyến nghị (default)
+- 3072 bits - Bảo mật cao
+- 4096 bits - Bảo mật rất cao, chậm hơn
+
+**Bước 2:** Chọn thư mục lưu
+- Click "Chọn thư mục..."
+- Chọn nơi lưu cặp khóa
+
+**Bước 3:** Tạo khóa
+- Click "Tạo khóa"
+- Đợi quá trình tạo khóa
+
+**Kết quả:**
+- `public_key.pem` - Dùng để mã hóa (có thể chia sẻ)
+- `private_key.pem` - Dùng để giải mã (⚠️ GIỮ BÍ MẬT!)
+
+---
+
+### 5. Compare - So sánh và tính Metrics
+
+**Bước 1:** Chọn 2 ảnh để so sánh
+- Ảnh 1: Cover/Original
+- Ảnh 2: Stego/Recovered
+
+**Bước 2:** Tính metrics
+- Click "Tính Metrics"
+- Đợi tính toán
+
+**Kết quả hiển thị:**
+
+**Metrics:**
+- **PSNR** (Peak Signal-to-Noise Ratio)
+  - \> 40 dB: Chất lượng rất tốt
+  - \> 30 dB: Chất lượng tốt
+  - < 30 dB: Chất lượng trung bình
+- **SSIM** (Structural Similarity Index)
+  - \> 0.95: Tương đồng rất cao
+  - \> 0.90: Tương đồng cao
+  - < 0.90: Tương đồng trung bình
+- **MSE** (Mean Squared Error)
+  - Càng nhỏ càng tốt
+
+---
+
+## Workflow điển hình
+
+### Scenario 1: Giấu tin đơn giản (không mã hóa)
+
+```
+1. Encode tab:
+   - Chọn cover.png
+   - Nhập: "Hello World"
+   - Encode → stego.png
+
+2. Decode tab:
+   - Chọn stego.png
+   - Decode → "Hello World"
+
+3. Compare tab:
+   - Ảnh 1: cover.png
+   - Ảnh 2: stego.png
+   - Metrics: PSNR ~45 dB, SSIM ~0.99
+```
+
+### Scenario 2: Giấu tin có mã hóa
+
+```
+1. GenRSA tab:
+   - Chọn 2048 bits
+   - Tạo khóa → public_key.pem, private_key.pem
+
+2. Encode tab:
+   - Chọn cover.png
+   - Nhập: "Secret message"
+   - ✅ Mã hóa RSA+AES
+   - Chọn public_key.pem
+   - Encode → encrypted_stego.png
+
+3. Decode tab:
+   - Chọn encrypted_stego.png
+   - ✅ Giải mã RSA+AES
+   - Chọn private_key.pem
+   - Decode → "Secret message"
+```
+
+### Scenario 3: Reversible Steganography
+
+```
+1. Encode tab:
+   - cover.png + "Secret" → stego.png
+
+2. Reverse tab:
+   - stego.png → recovered.png
+
+3. Compare tab:
+   - Ảnh 1: cover.png
+   - Ảnh 2: recovered.png
+   - Metrics: PSNR ~50 dB (gần như giống hệt)
+```
+
+---
+
+## So sánh với các phương pháp khác
+
+| Phương pháp        | PSNR   | SSIM  | Dung lượng | Tốc độ     | Reverse |
+| ------------------ | ------ | ----- | ---------- | ---------- | ------- |
+| **CustomGANStego** | 40+ dB | 0.99+ | Cao        | Nhanh      | ✅ Có   |
+| LSB                | 50+ dB | 0.99+ | Thấp       | Rất nhanh  | ❌ Không|
+| DCT-based          | 40+ dB | 0.95+ | Trung bình | Trung bình | ❌ Không|
+| DWT-based          | 35+ dB | 0.93+ | Trung bình | Chậm       | ❌ Không|
+
+**Ưu điểm CustomGANStego:**
+
+- ✅ Khả năng reverse (khôi phục ảnh gốc)
+- ✅ PSNR cao (>45 dB)
+- ✅ SSIM rất cao (>0.99)
+- ✅ Chống steganalysis tốt nhờ GAN
+- ✅ Tích hợp mã hóa RSA+AES
+
+---
+
+## 🔐 Bảo mật
+
+**⚠️ LƯU Ý QUAN TRỌNG:**
+
+1. **Private key:** KHÔNG bao giờ chia sẻ private key
+2. **Public key:** Có thể chia sẻ công khai
+3. **Stego image:** An toàn để chia sẻ (tin đã được mã hóa và giấu)
+4. **Backup keys:** Sao lưu private key ở nơi an toàn
+
+**Quy trình bảo mật tốt:**
+
+```
+Alice                          Bob
+-----                          ---
+1. Tạo RSA keypair
+2. Gửi public_key cho Bob  →
+3.                         ←   Bob: Encode với public_key
+4.                         ←   Nhận stego.png
+5. Decode với private_key
+6. Đọc được tin nhắn
+```
+
+---
+
+## 👨‍💻 Development
+
+### Run with debugging
+
+```batch
+python steganography_app.py --debug
+```
+
+### Rebuild after changes
+
+```batch
+build_app.bat
+```
+
+### Clean build
+
+```batch
+rmdir /s /q build dist venv __pycache__
+build_app.bat
+```
+
+---
+
+## Tài liệu tham khảo
+
+- **Paper:** "Hiding Images in Plain Sight: Deep Steganography" (Baluja, 2017)
+- **GAN:** "Generative Adversarial Networks" (Goodfellow et al., 2014)
+- **RSA:** "A Method for Obtaining Digital Signatures" (Rivest et al., 1978)
+
+---
 
 ## License
 
-MIT License - Xem file LICENSE trong project root.
+Project CustomGANStego - CNTT
+
+---
 
 ## Credits
 
-- **CustomGANStego Team**
-- Built with PyInstaller, PyTorch, and tkinter
-- Windows-optimized version
+- PyTorch Team
+- scikit-image
+- PyCryptodome
+- PyInstaller
+- CustomGANStego Team
+
+---
+
+**🎉 Chúc bạn sử dụng app thành công!**
+
+Nếu có vấn đề, vui lòng mở issue trên GitHub.
+

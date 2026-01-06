@@ -1,42 +1,31 @@
 @echo off
 REM ============================================
-REM All-in-One Build Script cho Windows App
-REM ============================================
-REM Chuc nang:
-REM - Tu dong tao va cai dat venv rieng
-REM - Kiem tra dependencies
-REM - Build app executable
-REM - Huong dan su dung
+REM Script Build Ung Dung CustomGANStego Windows
+REM Bao gom: Kiem Tra Moi Truong - Cai Dat - Build - Huong Dan
 REM ============================================
 
-REM Enable UTF-8 encoding for proper emoji display
-chcp 65001 >nul 2>&1
+setlocal EnableDelayedExpansion
 
 echo.
 echo ========================================================
-echo    CustomGANStego Windows App Builder (All-in-One)
+echo    Cong Cu Build Ung Dung CustomGANStego Windows
 echo ========================================================
 echo.
 
-REM Get script directory
+REM Lay duong dan thu muc script
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_DIR=%SCRIPT_DIR%.."
 set "VENV_DIR=%SCRIPT_DIR%venv"
 
-REM Parse arguments
-set "SETUP_ONLY=0"
-if "%1"=="--setup-only" set "SETUP_ONLY=1"
-if "%1"=="-s" set "SETUP_ONLY=1"
-
-REM ==================== BUOC 1: Kiem Tra & Setup Moi Truong ====================
-echo [Buoc 1] Kiem Tra ^& Setup Moi Truong
+REM ==================== BUOC 1: Kiem Tra Moi Truong ====================
+echo [Buoc 1] Kiem Tra Moi Truong
 echo --------------------------------------------------------
 
-REM Check Python version
+REM Kiem tra phien ban Python
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [LOI] Khong tim thay Python!
-    echo Vui long cai dat Python 3.8 tro len tu python.org
+    echo Vui long cai dat Python 3.10+ tu python.org
     pause
     exit /b 1
 )
@@ -44,108 +33,52 @@ if %errorlevel% neq 0 (
 for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
 echo [OK] Python: %PYTHON_VERSION%
 
-REM Check and create virtual environment
+REM Kiem tra moi truong ao
 if exist "%VENV_DIR%" (
-    echo [OK] Tim thay moi truong ao rieng cua windowsApp
+    echo [OK] Da tim thay moi truong ao: %VENV_DIR%
     call "%VENV_DIR%\Scripts\activate.bat"
-    
-    REM Kiem tra venv co bi hong khong
-    if not exist "%VENV_DIR%\Scripts\pip.exe" (
-        echo [CANH BAO] Moi truong ao bi hong, dang tao lai...
-        rmdir /s /q "%VENV_DIR%"
-        python -m venv "%VENV_DIR%"
-        call "%VENV_DIR%\Scripts\activate.bat"
-        echo [OK] Da tao lai moi truong ao
-    )
 ) else (
-    echo.
-    echo Chua co moi truong ao rieng
-    echo Dang tu dong tao moi truong ao tai: %VENV_DIR%
+    echo [INFO] Dang tao moi truong ao...
     echo.
     python -m venv "%VENV_DIR%"
     call "%VENV_DIR%\Scripts\activate.bat"
-    echo [OK] Da tao moi truong ao rieng
-    echo.
-    echo Dang nang cap pip...
-    python -m pip install --upgrade pip -q
-    echo [OK] Da nang cap pip
+    echo [OK] Da tao moi truong ao
 )
-
-REM Kiem tra venv da duoc activate
-if "%VIRTUAL_ENV%"=="" (
-    echo [LOI] Khong the kich hoat moi truong ao
-    pause
-    exit /b 1
-)
-
-echo [OK] Moi truong ao: %VIRTUAL_ENV%
 
 echo.
 
-REM ==================== BUOC 2: Kiem Tra & Cai Dat Dependencies ====================
-echo [Buoc 2] Kiem Tra ^& Cai Dat Dependencies
+REM ==================== BUOC 2: Cai Dat Dependencies ====================
+echo [Buoc 2] Cai Dat Dependencies
 echo --------------------------------------------------------
 
-echo Dang kiem tra dependencies...
-python -c "import torch, torchvision, PIL, numpy, imageio, reedsolo, PyInstaller; from skimage.metrics import peak_signal_noise_ratio; import matplotlib; print('[OK] Tat ca dependencies da co')" 2>nul
+echo Dang nang cap pip...
+python -m pip install --upgrade pip --quiet
 
+echo Dang cai dat requirements...
+pip install -r requirements.txt --quiet
+
+REM Fix loi tuong thich scipy cho Python 3.13+ va PyInstaller
+echo Kiem tra tuong thich scipy...
+pip uninstall -y scipy 2>nul
+echo Dang cai dat scipy tuong thich voi Python 3.13 va PyInstaller...
+pip install "scipy>=1.14.0" --quiet
+
+REM Kiem tra cac package quan trong
+python -c "import torch" 2>nul
 if %errorlevel% neq 0 (
-    echo Phat hien thieu dependencies, dang tu dong cai dat...
-    echo.
-    
-    echo Nang cap pip...
-    python -m pip install --upgrade pip -q
-    
-    echo Cai dat packages tu requirements.txt...
-    pip install -r requirements.txt
-    
-    if %errorlevel% neq 0 (
-        echo [LOI] Cai dat dependencies that bai
-        echo.
-        echo Thu cai thu cong:
-        echo   %VENV_DIR%\Scripts\activate.bat
-        echo   pip install -r requirements.txt
-        echo.
-        pause
-        exit /b 1
-    )
-    
-    echo.
-    echo [OK] Da cai dat xong, dang kiem tra lai...
-    python -c "import torch, torchvision; from PIL import Image; import numpy, imageio, reedsolo; from skimage.metrics import peak_signal_noise_ratio; import matplotlib, PyInstaller; print('[OK] Tat ca dependencies da OK')"
-    
-    if %errorlevel% neq 0 (
-        echo [LOI] Van con loi sau khi cai dat
-        pause
-        exit /b 1
-    )
-) else (
-    echo [OK] Tat ca dependencies da san sang
+    echo [CANH BAO] PyTorch chua duoc cai dat dung cach
+    echo Dang cai dat PyTorch...
+    pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 )
 
+python -c "import tkinter" 2>nul
+if %errorlevel% neq 0 (
+    echo [CANH BAO] tkinter khong kha dung
+    echo Vui long cai dat tkinter cho phien ban Python cua ban
+)
+
+echo [OK] Tat ca dependencies da duoc cai dat
 echo.
-
-REM Neu chi setup, dung lai o day
-if "%SETUP_ONLY%"=="1" (
-    echo.
-    echo ========================================================
-    echo [OK] Setup Hoan Tat!
-    echo ========================================================
-    echo.
-    echo Moi truong ao: %VENV_DIR%
-    echo.
-    echo De su dung:
-    echo   %VENV_DIR%\Scripts\activate.bat
-    echo.
-    echo De build app:
-    echo   build_app.bat
-    echo.
-    echo De deactivate:
-    echo   deactivate
-    echo.
-    pause
-    exit /b 0
-)
 
 REM ==================== BUOC 3: Kiem Tra File Model ====================
 echo [Buoc 3] Kiem Tra File Model
@@ -157,95 +90,141 @@ if exist "%PROJECT_DIR%\results\model\" (
         echo [OK] Da tim thay file model trong results/model/
     ) else (
         echo [CANH BAO] Khong tim thay file model
-        echo Vui long huan luyen model truoc: python train.py
+        echo Vui long train model truoc: python train.py
     )
 ) else (
     echo [CANH BAO] Khong tim thay thu muc results/model/
-    echo Vui long huan luyen model truoc: python train.py
+    echo Vui long train model truoc: python train.py
 )
 
 echo.
 
-REM ==================== BUOC 4: Build Ung Dung ====================
-echo [Buoc 4] Build Ung Dung Windows
+REM ==================== BUOC 4: Kiem Tra File Ung Dung ====================
+echo [Buoc 4] Kiem Tra File Ung Dung
 echo --------------------------------------------------------
 
-REM Dong app neu dang chay
-echo Kiem tra va dong process CustomGANStego neu dang chay...
-tasklist /FI "IMAGENAME eq CustomGANStego.exe" 2>nul | find /I "CustomGANStego.exe" >nul
-if %errorlevel% equ 0 (
-    echo Dang dong CustomGANStego.exe...
-    taskkill /F /IM CustomGANStego.exe >nul 2>&1
-    timeout /t 2 /nobreak >nul
+REM Kiem tra neu steganography_app.py ton tai, neu khong thi copy tu macOSApp
+if not exist "%SCRIPT_DIR%steganography_app.py" (
+    echo [INFO] Dang copy steganography_app.py tu macOSApp...
+    copy "%PROJECT_DIR%\macOSApp\steganography_app.py" "%SCRIPT_DIR%steganography_app.py" >nul
+    echo [OK] Da copy steganography_app.py
+) else (
+    REM Kiem tra neu file rong hoac qua nho
+    for %%A in ("%SCRIPT_DIR%steganography_app.py") do (
+        if %%~zA LSS 100 (
+            echo [INFO] File rong, dang copy lai...
+            copy /y "%PROJECT_DIR%\macOSApp\steganography_app.py" "%SCRIPT_DIR%steganography_app.py" >nul
+            echo [OK] Da copy lai steganography_app.py
+        ) else (
+            echo [OK] Da tim thay steganography_app.py
+        )
+    )
 )
 
-REM Xoa cac file build cu
+echo.
+
+REM ==================== BUOC 5: Build Ung Dung ====================
+echo [Buoc 5] Build Ung Dung Windows
+echo --------------------------------------------------------
+
 if exist "dist" (
-    echo Dang xoa thu muc dist cu...
-    attrib -r -h -s "dist\*.*" /s /d >nul 2>&1
-    rmdir /s /q "dist" 2>nul
-    timeout /t 1 /nobreak >nul
+    echo Dang don dep ban build cu...
+    rmdir /s /q dist 2>nul
 )
-
 if exist "build" (
-    echo Dang xoa thu muc build cu...
-    attrib -r -h -s "build\*.*" /s /d >nul 2>&1
-    rmdir /s /q "build" 2>nul
-    timeout /t 1 /nobreak >nul
+    rmdir /s /q build 2>nul
 )
-
-if exist "CustomGANStego.spec" (
-    echo Xoa spec file cu...
-    del /f /q "CustomGANStego.spec" 2>nul
-)
-
-echo Don dep hoan tat
-echo.
-
-REM Copy dependencies to local to avoid network path issues
-echo Sao chep cac file can thiet vao local...
-if not exist "%SCRIPT_DIR%temp_build" mkdir "%SCRIPT_DIR%temp_build"
-copy /Y "%PROJECT_DIR%\encoder.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
-copy /Y "%PROJECT_DIR%\decoder.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
-copy /Y "%PROJECT_DIR%\critic.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
-copy /Y "%PROJECT_DIR%\reverse_decoder.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
-copy /Y "%PROJECT_DIR%\enhancedstegan.py" "%SCRIPT_DIR%temp_build\" >nul 2>&1
-echo [OK] Da sao chep dependencies
-echo.
 
 echo Dang chay PyInstaller...
-python -m PyInstaller --clean --name=CustomGANStego --windowed --onefile --add-data "%PROJECT_DIR%\results\model;results\model" --add-data "%SCRIPT_DIR%temp_build\encoder.py;." --add-data "%SCRIPT_DIR%temp_build\decoder.py;." --add-data "%SCRIPT_DIR%temp_build\critic.py;." --add-data "%SCRIPT_DIR%temp_build\reverse_decoder.py;." --add-data "%SCRIPT_DIR%temp_build\enhancedstegan.py;." --hidden-import torch --hidden-import torchvision --hidden-import PIL --hidden-import numpy --hidden-import skimage --hidden-import Crypto --hidden-import imageio --hidden-import imageio.core --hidden-import imageio.plugins --hidden-import reedsolo --hidden-import matplotlib --hidden-import psutil --collect-all torch --collect-all torchvision --collect-all imageio steganography_app.py
+echo (Qua trinh nay co the mat vai phut)
+echo.
 
-REM Cleanup temp files
-if exist "%SCRIPT_DIR%temp_build" rmdir /s /q "%SCRIPT_DIR%temp_build" >nul 2>&1
+python -m PyInstaller --clean ^
+    --name=CustomGANStego ^
+    --windowed ^
+    --onefile ^
+    --add-data "%PROJECT_DIR%\results\model;results\model" ^
+    --add-data "%PROJECT_DIR%\encoder.py;." ^
+    --add-data "%PROJECT_DIR%\decoder.py;." ^
+    --add-data "%PROJECT_DIR%\critic.py;." ^
+    --add-data "%PROJECT_DIR%\reverse_decoder.py;." ^
+    --add-data "%PROJECT_DIR%\enhancedstegan.py;." ^
+    --collect-all torch ^
+    --collect-all torchvision ^
+    --collect-all imageio ^
+    --collect-all skimage ^
+    --collect-all scipy ^
+    --collect-all PIL ^
+    --collect-all matplotlib ^
+    --hidden-import numbers ^
+    --hidden-import scipy._lib ^
+    --hidden-import scipy._lib.messagestream ^
+    --hidden-import scipy._lib._ccallback_c ^
+    --hidden-import scipy._lib._testutils ^
+    --hidden-import scipy.stats ^
+    --hidden-import scipy.stats._stats_py ^
+    --hidden-import scipy.stats.distributions ^
+    --hidden-import scipy.stats._distn_infrastructure ^
+    --hidden-import scipy.stats._continuous_distns ^
+    --hidden-import scipy.stats._discrete_distns ^
+    --hidden-import scipy.stats._multivariate ^
+    --hidden-import scipy.stats._constants ^
+    --hidden-import scipy.stats._stats_mstats_common ^
+    --hidden-import scipy.stats._resampling ^
+    --hidden-import scipy.stats._entropy ^
+    --hidden-import scipy.stats.morestats ^
+    --hidden-import scipy.special ^
+    --hidden-import scipy.special._ufuncs ^
+    --hidden-import scipy.special._cdflib ^
+    --hidden-import scipy.special.cython_special ^
+    --hidden-import scipy.linalg ^
+    --hidden-import scipy.linalg._fblas ^
+    --hidden-import scipy.linalg._flapack ^
+    --hidden-import scipy.linalg.cython_blas ^
+    --hidden-import scipy.linalg.cython_lapack ^
+    --hidden-import scipy.integrate ^
+    --hidden-import scipy.interpolate ^
+    --hidden-import scipy.ndimage ^
+    --hidden-import scipy.ndimage._ni_support ^
+    --hidden-import scipy.sparse ^
+    --hidden-import scipy.sparse.linalg ^
+    --hidden-import scipy.sparse.csgraph ^
+    --hidden-import reedsolo ^
+    --hidden-import Crypto ^
+    --hidden-import Crypto.Cipher ^
+    --hidden-import Crypto.Cipher.AES ^
+    --hidden-import Crypto.Cipher.PKCS1_OAEP ^
+    --hidden-import Crypto.PublicKey ^
+    --hidden-import Crypto.PublicKey.RSA ^
+    --hidden-import Crypto.Random ^
+    --hidden-import Crypto.Util ^
+    --hidden-import Crypto.Util.Padding ^
+    --collect-all reedsolo ^
+    --collect-all pycryptodome ^
+    steganography_app.py
 
 if errorlevel 1 (
     echo.
     echo [LOI] Build that bai!
     echo.
-    echo Debug:
-    echo   %VENV_DIR%\Scripts\activate.bat
-    echo   pip install -r requirements.txt
-    echo   python -m PyInstaller steganography_app.py
-    echo.
     pause
     exit /b 1
 )
 
-echo [OK] Hoan tat build thanh cong
+echo [OK] Build hoan tat thanh cong
 echo.
 
-REM ==================== BUOC 5: Tao Goi Ung Dung ====================
-echo [Buoc 5] Dong Goi Ung Dung
+REM ==================== BUOC 6: Kiem Tra Ket Qua ====================
+echo [Buoc 6] Dong Goi Ung Dung
 echo --------------------------------------------------------
 
 if exist "dist\CustomGANStego.exe" (
     echo [OK] Da tao file thuc thi: dist\CustomGANStego.exe
     
-    REM Get file size
+    REM Lay kich thuoc file
     for %%A in ("dist\CustomGANStego.exe") do set SIZE=%%~zA
-    set /a SIZE_MB=%SIZE% / 1048576
-    echo      Kich thuoc: ~%SIZE_MB% MB
+    set /a SIZE_MB=!SIZE! / 1048576
+    echo      Kich thuoc: ~!SIZE_MB! MB
 ) else (
     echo [LOI] Khong tim thay file thuc thi!
     pause
@@ -254,23 +233,30 @@ if exist "dist\CustomGANStego.exe" (
 
 echo.
 
-REM ==================== BUOC 6: Huong Dan Su Dung ====================
-echo [Buoc 6] Huong Dan Su Dung
+REM ==================== BUOC 7: Huong Dan Su Dung ====================
+echo [Buoc 7] Huong Dan Su Dung
 echo ========================================================
 echo.
-echo [OK] BUILD THANH CONG!
+echo BUILD THANH CONG!
 echo.
 echo Vi Tri Dau Ra:
 echo   dist\CustomGANStego.exe
 echo.
 echo De Chay:
 echo   1. Double-click: dist\CustomGANStego.exe
-echo   2. Hoac tu lenh: .\dist\CustomGANStego.exe
+echo   2. Hoac tu dong lenh: .\dist\CustomGANStego.exe
 echo.
 echo Phan Phoi:
-echo   - Sao chep dist\CustomGANStego.exe vao bat ky PC Windows nao
-echo   - Khong can cai dat Python tren PC dich
+echo   - Copy dist\CustomGANStego.exe den bat ky may Windows nao
+echo   - Khong can cai dat Python tren may dich
 echo   - File model da duoc tich hop trong file thuc thi
+echo.
+echo Tinh Nang:
+echo   - Encode:  Giau tin vao anh
+echo   - Decode:  Trich xuat tin tu anh
+echo   - Reverse: Khoi phuc anh goc tu anh stego
+echo   - GenRSA:  Tao cap khoa RSA
+echo   - Compare: Tinh PSNR/SSIM metrics
 echo.
 echo Luu Y:
 echo   - Lan chay dau co the mat 10-15 giay de giai nen

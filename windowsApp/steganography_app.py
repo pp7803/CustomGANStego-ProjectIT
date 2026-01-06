@@ -893,11 +893,20 @@ class SteganographyApp:
                         self.text_widget.see(tk.END)
                     except:
                         pass
-                self.original_stream.write(message)
-                self.original_stream.flush()
+                # Check if original_stream exists (None when --windowed mode)
+                if self.original_stream is not None:
+                    try:
+                        self.original_stream.write(message)
+                        self.original_stream.flush()
+                    except:
+                        pass
                 
             def flush(self):
-                self.original_stream.flush()
+                if self.original_stream is not None:
+                    try:
+                        self.original_stream.flush()
+                    except:
+                        pass
         
         sys.stdout = ConsoleRedirect(self.debug_log, sys.__stdout__, self.log_messages)
         sys.stderr = ConsoleRedirect(self.debug_log, sys.__stderr__, self.log_messages)

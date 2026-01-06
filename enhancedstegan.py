@@ -278,7 +278,8 @@ def encode_message(cover_image_path, secret_text, output_path, model_path=None):
     
     encoder.eval()
     
-    cover_im = imread(cover_image_path, pilmode='RGB') / 127.5 - 1.0
+    cover_img = Image.open(cover_image_path).convert('RGB')
+    cover_im = np.array(cover_img) / 127.5 - 1.0
     cover = torch.FloatTensor(cover_im).permute(2, 1, 0).unsqueeze(0)
     cover_size = cover.size()
     
@@ -320,7 +321,8 @@ def decode_message(stego_image_path, model_path=None):
     
     decoder.eval()
     
-    image = imread(stego_image_path, pilmode='RGB') / 127.5 - 1.0
+    stego_img = Image.open(stego_image_path).convert('RGB')
+    image = np.array(stego_img) / 127.5 - 1.0
     image = torch.FloatTensor(image).permute(2, 1, 0).unsqueeze(0)
     
     with torch.no_grad():
@@ -356,7 +358,8 @@ def reverse_hiding(stego_image_path, output_path, model_path=None):
     
     reverse_decoder.eval()
     
-    stego_im = imread(stego_image_path, pilmode='RGB') / 127.5 - 1.0
+    stego_img = Image.open(stego_image_path).convert('RGB')
+    stego_im = np.array(stego_img) / 127.5 - 1.0
     stego = torch.FloatTensor(stego_im).permute(2, 1, 0).unsqueeze(0)
     stego = stego.to(device)
     
